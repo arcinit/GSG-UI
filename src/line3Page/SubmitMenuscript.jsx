@@ -11,8 +11,10 @@ import {
   Send,
   UploadCloud,
 } from "lucide-react";
+import http from "../service/http";
+import { toast } from "react-toastify";
 
-export default function SubmitManuscript() {
+export default function SubmitManuscript({ journals }) {
   const [step, setStep] = useState(0);
 
   const steps = [
@@ -22,6 +24,37 @@ export default function SubmitManuscript() {
     { label: "Declarations", icon: AlertCircle },
     { label: "Review & Submit", icon: Send },
   ];
+
+  const [form, setForm] = useState({
+    // STEP 1
+    author_name: "",
+    email: "",
+    institution: "",
+    orcid: "",
+    co_authors: "",
+
+    // STEP 2
+    journal: "",
+    article_type: "",
+    title: "",
+    abstract: "",
+    keywords: "",
+
+    // STEP 3
+    manuscript_file: null,
+    cover_letter: null,
+    supplementary_files: null,
+
+    // STEP 4
+    declarations: [],
+  });
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   return (
     <div className="bg-[#E7F9FF] min-h-screen">
@@ -131,20 +164,39 @@ export default function SubmitManuscript() {
       </div>
 
       {/* ================= STEP CONTENT ================= */}
-      {step === 0 && <AuthorDetailsForm onNext={() => setStep(1)} />}
+      {step === 0 && (
+        <AuthorDetailsForm
+          form={form}
+          setForm={setForm}
+          onNext={() => setStep(1)}
+        />
+      )}
       {step === 1 && (
         <ManuscriptInfoForm
+          form={form}
+          setForm={setForm}
+          journals={journals}
           onNext={() => setStep(2)}
           onPrev={() => setStep(0)}
         />
       )}
       {step === 2 && (
-        <UploadFiles onNext={() => setStep(3)} onPrev={() => setStep(1)} />
+        <UploadFiles
+          form={form}
+          setForm={setForm}
+          onNext={() => setStep(3)}
+          onPrev={() => setStep(1)}
+        />
       )}
       {step === 3 && (
-        <Declarations onNext={() => setStep(4)} onPrev={() => setStep(2)} />
+        <Declarations
+          form={form}
+          setForm={setForm}
+          onNext={() => setStep(4)}
+          onPrev={() => setStep(2)}
+        />
       )}
-      {step === 4 && <ReviewSubmit onPrev={() => setStep(3)} />}
+      {step === 4 && <ReviewSubmit form={form} onPrev={() => setStep(3)} />}
     </div>
   );
 }
@@ -152,7 +204,7 @@ export default function SubmitManuscript() {
 {
   /* ================= STEP 1 ================= */
 }
-function AuthorDetailsForm({ onNext, onPrev }) {
+function AuthorDetailsForm({ onNext, onPrev, form, setForm }) {
   return (
     <div className="px-6 py-10">
       <div className="max-w-7xl mx-auto bg-[#D5F4FF] rounded-[16px] p-[16px] shadow-sm">
@@ -170,6 +222,10 @@ function AuthorDetailsForm({ onNext, onPrev }) {
               <span className="text-[#FF3939]">*</span>
             </label>
             <input
+              value={form.author_name}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, author_name: e.target.value }))
+              }
               className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
               placeholder="John Smith"
             />
@@ -181,7 +237,11 @@ function AuthorDetailsForm({ onNext, onPrev }) {
               Email Address <span className="text-[#FF3939]">*</span>
             </label>
             <input
-              className="p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
+              value={form.email}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, email: e.target.value }))
+              }
+              className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
               placeholder="johnsmith@example.com"
             />
           </div>
@@ -192,6 +252,10 @@ function AuthorDetailsForm({ onNext, onPrev }) {
               Institution/Affiliation <span className="text-[#FF3939]">*</span>
             </label>
             <input
+              value={form.institution}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, institution: e.target.value }))
+              }
               className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
               placeholder="Dept. of Engineering, MIT, USA"
             />
@@ -203,6 +267,10 @@ function AuthorDetailsForm({ onNext, onPrev }) {
               ORCID ID (Optional)
             </label>
             <input
+              value={form.orcid}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, orcid: e.target.value }))
+              }
               className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
               placeholder="0000-0002-4853-8029"
             />
@@ -214,6 +282,10 @@ function AuthorDetailsForm({ onNext, onPrev }) {
               Co-Authors (if any)
             </label>
             <textarea
+              value={form.co_authors}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, co_authors: e.target.value }))
+              }
               className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none h-[140px]"
               placeholder="List of co-authors with their affiliations, one per line."
             ></textarea>
@@ -244,7 +316,7 @@ function AuthorDetailsForm({ onNext, onPrev }) {
 {
   /* ================= STEP 2 ================= */
 }
-function ManuscriptInfoForm({ onNext, onPrev }) {
+function ManuscriptInfoForm({ onNext, onPrev, form, setForm, journals }) {
   return (
     <div className="px-6 py-10">
       <div className="max-w-7xl mx-auto bg-[#D5F4FF] rounded-[16px] p-[16px] shadow-sm">
@@ -260,8 +332,22 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
             <label className="text-[12px] md:text-[14px] font-medium text-[#000000] mb-1 block">
               Select Journal <span className="text-[#FF3939]">*</span>
             </label>
-            <select className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none">
-              <option>Choose Journal</option>
+            <select
+              value={form.journal}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  journal: e.target.value,
+                }))
+              }
+              className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
+            >
+              <option value="">Choose Journal</option>
+              {journals.map((j) => (
+                <option key={j.id} value={j.journal_slug}>
+                  {j.title}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -270,8 +356,20 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
             <label className="text-[12px] md:text-[14px] font-medium text-[#000000] mb-1 block">
               Article Type <span className="text-[#FF3939]">*</span>
             </label>
-            <select className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none">
-              <option>Select Type</option>
+            <select
+              value={form.article_type}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  article_type: e.target.value,
+                }))
+              }
+              className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
+            >
+              <option value="">Select Type</option>
+              <option value="Research Article">Research Article</option>
+              <option value="Review">Review</option>
+              <option value="Case Study">Case Study</option>
             </select>
           </div>
         </div>
@@ -282,6 +380,10 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
             Manuscript Title <span className="text-[#FF3939]">*</span>
           </label>
           <input
+            value={form.title}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, title: e.target.value }))
+            }
             className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
             placeholder="Enter the full title of your Manuscript"
           />
@@ -293,6 +395,10 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
             Abstract <span className="text-[#FF3939]">*</span>
           </label>
           <textarea
+            value={form.abstract}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, abstract: e.target.value }))
+            }
             className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none h-[140px]"
             placeholder="Provide a structural abstract of your research"
           ></textarea>
@@ -309,6 +415,10 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
             Keywords (5–7, comma-separated)
           </label>
           <input
+            value={form.keywords}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, keywords: e.target.value }))
+            }
             className="w-full p-[12px] rounded-[12px] bg-[#E7F9FF] border border-[#C6E4EF] text-[14px] outline-none"
             placeholder="Machine Learning, Predictive Maintenance, Industrial Maintenance, IoT"
           />
@@ -339,7 +449,7 @@ function ManuscriptInfoForm({ onNext, onPrev }) {
   /* ================= STEP 3 ================= */
 }
 
-function UploadFiles({ onNext, onPrev }) {
+function UploadFiles({ onNext, onPrev, form, setForm }) {
   return (
     <div className="bg-[#D6E3E7] px-6 md:px-16 py-10">
       <div className="max-w-7xl mx-auto bg-[#D5F4FF] rounded-[16px] p-[16px] shadow-sm">
@@ -352,18 +462,27 @@ function UploadFiles({ onNext, onPrev }) {
         <UploadCard
           title="Manuscript File"
           required
+          field="manuscript_file"
+          setForm={setForm}
+          form={form}
           desc="Upload your manuscript in Word format (.doc, .docx)"
         />
 
         {/* ================= CARD 2 ================= */}
         <UploadCard
           title="Cover Letter (Optional)"
+          field="cover_letter"
+          setForm={setForm}
+          form={form}
           desc="A letter addressed to the Editor-in-Chief"
         />
 
         {/* ================= CARD 3 ================= */}
         <UploadCard
           title="Supplementary Materials (Optional)"
+          field="supplementary_materials"
+          setForm={setForm}
+          form={form}
           desc="Figures, data files, or additional materials"
         />
 
@@ -388,7 +507,8 @@ function UploadFiles({ onNext, onPrev }) {
   );
 }
 
-function UploadCard({ title, desc, required }) {
+function UploadCard({ title, desc, required, field, setForm, form }) {
+  const file = form?.[field];
   return (
     <div className="border-2 border-dashed border-[#C6E4EF] rounded-xl pt-[40px] pb-[40px] text-center mb-5 bg-[#E7F9FF]">
       {/* ICON */}
@@ -406,10 +526,23 @@ function UploadCard({ title, desc, required }) {
       <p className="text-[12px] md:text-[24px] text-[#A9ACB4] mt-1 mb-3">
         {desc}
       </p>
+      {/* FILE NAME (NEW) */}
+      {file && (
+        <p className="text-[13px] text-green-600 mb-2">📄 {file.name}</p>
+      )}
 
       {/* BUTTON */}
       <label className="inline-block cursor-pointer mt-4">
-        <input type="file" className="hidden" />
+        <input
+          type="file"
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              [field]: e.target.files[0],
+            }))
+          }
+          className="hidden"
+        />
         <span className="px-[16px] py-[12px] text-[14px] border bg-[#D5F4FF] border-[#00849F] text-[#133C49] rounded-[12px] hover:bg-[#00D4FF] hover:text-black transition">
           Choose file
         </span>
@@ -421,7 +554,7 @@ function UploadCard({ title, desc, required }) {
 {
   /* ================= STEP 4 ================= */
 }
-function Declarations({ onNext, onPrev }) {
+function Declarations({ onNext, onPrev, form, setForm }) {
   const items = [
     {
       title: "Original Work Declaration",
@@ -477,6 +610,21 @@ function Declarations({ onNext, onPrev }) {
               {/* CHECKBOX */}
               <input
                 type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setForm((prev) => ({
+                      ...prev,
+                      declarations: [...prev.declarations, item.title],
+                    }));
+                  } else {
+                    setForm((prev) => ({
+                      ...prev,
+                      declarations: prev.declarations.filter(
+                        (d) => d !== item.title,
+                      ),
+                    }));
+                  }
+                }}
                 className="mt-1 w-[20px] h-[20px] rounded-[4px] accent-[#E2E8F0]"
               />
 
@@ -520,7 +668,62 @@ function Declarations({ onNext, onPrev }) {
   /* ================= STEP 5 ================= */
 }
 
-function ReviewSubmit({ onPrev }) {
+function ReviewSubmit({ onPrev, form }) {
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      // append all fields
+      Object.keys(form).forEach((key) => {
+        if (key === "declarations") {
+          formData.append(key, JSON.stringify(form[key]));
+        } else {
+          formData.append(key, form[key]);
+        }
+      });
+      formData.append("file", form.manuscript_file); // file
+      // formData.append("title", form.title);
+      // formData.append("author_name", form.author_name);
+      // formData.append("email", form.email);
+      // formData.append("message", form.abstract || ""); // using abstract as message
+      // formData.append("journal_slug", form.journal);
+
+      // 🔍 Debug (VERY IMPORTANT)
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      //console data
+      console.log("Form Data:", form);
+
+      const res = await http.post("/journals/submit-manuscript/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // console.log(res.data);
+
+      // success
+      toast("Submitted Successfully!");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      const errors = err?.response?.data;
+
+      if (errors) {
+        Object.keys(errors).forEach((field) => {
+          errors[field].forEach((message) => {
+            toast.error(message);
+          });
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="px-6 py-10">
       <div className="max-w-7xl mx-auto bg-[#D5F4FF] rounded-[16px] p-[16px] shadow-sm">
@@ -532,43 +735,72 @@ function ReviewSubmit({ onPrev }) {
         {/* ================= AUTHOR DETAILS ================= */}
         <Section title="Author Details">
           <p>
-            <b>Corresponding Author:</b> John Smith
+            <b>Corresponding Author:</b> {form.author_name || "—"}
           </p>
           <p>
-            <b>Email:</b> johnsmith@gmail.com
+            <b>Email:</b> {form.email || "—"}
           </p>
           <p>
-            <b>Institution:</b> Mechanical Engineering, MIT, India
+            <b>Institution:</b> {form.institution || "—"}
           </p>
         </Section>
 
         {/* ================= MANUSCRIPT ================= */}
         <Section title="Manuscript Information">
           <p>
-            <b>Journal:</b> Journal of Medical Sciences & Clinical Research
+            <b>Journal:</b> {form.journal || "—"}
           </p>
           <p>
-            <b>Article Type:</b> Case Study
+            <b>Article Type:</b> {form.article_type || "—"}
           </p>
           <p>
-            <b>Title:</b> Test Title
+            <b>Title:</b> {form.title || "—"}
           </p>
         </Section>
 
         {/* ================= FILES ================= */}
         <Section title="Uploaded Files">
           <div className="space-y-2 text-[14px] text-[#4F5C60]">
-            <FileItem name="Manuscript: sample-abstract-form.docx" />
-            <FileItem name="Manuscript: sample-abstract-form.docx" />
+            {form.manuscript_file && (
+              <FileItem name={`Manuscript: ${form.manuscript_file.name}`} />
+            )}
+
+            {form.cover_letter && (
+              <FileItem name={`Cover Letter: ${form.cover_letter.name}`} />
+            )}
+
+            {form.supplementary_files && (
+              <FileItem
+                name={`Supplementary: ${form.supplementary_files.name}`}
+              />
+            )}
+
+            {!form.manuscript_file &&
+              !form.cover_letter &&
+              !form.supplementary_files && (
+                <p className="text-[#999]">No files uploaded</p>
+              )}
           </div>
         </Section>
 
         {/* ================= DECLARATIONS ================= */}
         <Section title="Declarations">
-          <div className="flex items-center gap-2 text-[14px] text-[#4F5C60]">
+          {/* <div className="flex items-center gap-2 text-[14px] text-[#4F5C60]">
             <img src="/tick-circle3.png" alt="" className="w-[24px] h-[24px]" />
             All required declarations confirmed
-          </div>
+          </div> */}
+          {form.declarations?.length > 0 ? (
+            <div className="space-y-2">
+              {form.declarations.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 text-[14px]">
+                  <img src="/tick-circle3.png" className="w-[20px]" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[#999]">No declarations selected</p>
+          )}
         </Section>
 
         {/* ================= NOTE ================= */}
@@ -586,9 +818,12 @@ function ReviewSubmit({ onPrev }) {
             Previous
           </button>
 
-          <button className="flex items-center gap-2 px-[16px] py-[12px] bg-[#01D4FF] text-[#133C49] rounded-lg text-[14px] font-normal">
+          <button
+            onClick={handleSubmit}
+            className="flex items-center gap-2 px-[16px] py-[12px] bg-[#01D4FF] text-[#133C49] rounded-lg text-[14px] font-normal"
+          >
             <Send size={20} />
-            Submit Manuscript
+            {loading ? "Submitting..." : "Submit Manuscript"}
           </button>
         </div>
       </div>

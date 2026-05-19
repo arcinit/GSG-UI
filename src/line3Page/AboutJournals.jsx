@@ -1,24 +1,49 @@
 import { Phone, Mail, MessageCircle, Download, Link } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { data, useNavigate, useParams } from "react-router-dom";
+import http from "../service/http";
 
 const AboutJournals = () => {
+  const [details, setDetails] = useState(null);
+  const { slug } = useParams();
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const resJournals = await http.get(`/journals/journal/${slug}/full/`);
+        console.log("resJounals:-", resJournals?.data);
+
+        setDetails(resJournals?.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchDetails();
+  }, []);
   return (
     <div className="bg-[#E7F9FF]">
-      <JournalsHero />
-      <JournalDetails />
+      <JournalsHero data={details} />
+      <JournalDetails data={details} />
     </div>
   );
 };
 
 export default AboutJournals;
 
-function JournalsHero() {
+function JournalsHero({ data }) {
+  const navigate = useNavigate();
   return (
     <div className="bg-[#0B2C36] px-6 md:px-16 py-16 border-b border-[#2C5B63] pt-40">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-center md:items-start">
         {/* LEFT IMAGE */}
-        <div className="w-[200px] h-[286px] bg-[#D9D9D9] rounded-xl shrink-0"></div>
+        <div className="w-[200px] h-[286px] bg-[#D9D9D9] rounded-xl shrink-0">
+          <img
+            src={data?.cover_image}
+            alt=""
+            className="w-full h-full rounded-xl"
+          />
+        </div>
 
         {/* RIGHT CONTENT */}
         <div className="flex-1">
@@ -28,46 +53,60 @@ function JournalsHero() {
               Medical Science
             </span>
 
-            <span className="text-[12px] px-[12px] py-[8px] border border-[#0BD400] text-[#0BD400] rounded-[8px]">
-              Open Access
-            </span>
+            {data?.is_open_access && (
+              <span className="text-[12px] px-[12px] py-[8px] border border-[#0BD400] text-[#0BD400] rounded-[8px]">
+                Open Access
+              </span>
+            )}
           </div>
 
           {/* TITLE */}
           <h1 className="text-[26px] md:text-[32px] font-semibold text-white leading-snug">
-            International Journal of Advanced Engineering Research
+            {/* International Journal of Advanced Engineering Research */}
+            {data?.title}
           </h1>
 
           {/* DESCRIPTION */}
           <p className="mt-3 text-[#FFFFFF] text-[14px] md:text-[18px] ">
-            A peer-reviewed journal covering all aspects of engineering sciences
-            including mechanical, civil, electrical, and chemical engineering.
+            {/* A peer-reviewed journal covering all aspects of engineering sciences
+            including mechanical, civil, electrical, and chemical engineering. */}
+            {data?.short_description}
           </p>
 
           {/* META INFO */}
           <div className="flex flex-wrap gap-6 mt-4 text-[14px] text-[#FFFFFF]/70">
             <span>
               <img src="/global.png" alt="" className="inline mr-1" />{" "}
-              Publisher: Global Scientific Publications
+              Publisher:{data?.publisher || "N/A"}
+              {/* Global Scientific Publications */}
             </span>
             <span>
               <img src="/bluecalendar.png" alt="" className="inline mr-1" />{" "}
-              Frequency: Monthly
+              Frequency: {data?.publication_frequency || "N/A"}
             </span>
           </div>
 
           {/* ISSN */}
           <div className="mt-2 text-[14px] text-[#FFFFFF]/70">
-            ISSN (Online): 2456-7890 &nbsp; ISSN (Print): 2456-7889
+            ISSN (Online): {data?.ISSN_online} &nbsp; ISSN (Print):{" "}
+            {data?.ISSN_print}
           </div>
 
           {/* BUTTONS */}
           <div className="flex gap-4 mt-6">
-            <button className="bg-[#01D4FF]  text-[#072A41] text-[14px] px-[12px] py-[8px] rounded-[12px] font-medium hover:opacity-90">
+            <button
+              onClick={() => navigate("/journals/submit-manuscript")}
+              className="bg-[#01D4FF]  text-[#072A41] text-[14px] px-[12px] py-[8px] rounded-[12px] font-medium hover:opacity-90"
+            >
               Submit Manuscript
             </button>
 
-            <button className="border border-[#01D4FF] text-[#01D4FF] text-[14px] px-[12px] py-[8px] rounded-[12px] hover:bg-[#00D4FF] hover:text-black transition">
+            <button
+              onClick={() => {
+                window.open(data?.guidelines_file, "_blank");
+              }}
+              className="border border-[#01D4FF] text-[#01D4FF] text-[14px] px-[12px] py-[8px] rounded-[12px] hover:bg-[#00D4FF] hover:text-black transition"
+            >
               Download Guidelines
             </button>
           </div>
@@ -77,18 +116,27 @@ function JournalsHero() {
   );
 }
 
-function JournalDetails() {
+function JournalDetails({ data }) {
   return (
     <div className="">
       {/* ================= STATS BAR ================= */}
       <div className="bg-[#133C49] text-center py-6 px-6 md:px-16">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-6 text-white">
           {[
-            { value: "3.245", label: "Impact Factor" },
-            { value: "42", label: "H-Index" },
-            { value: "4.8", label: "Citation Score" },
-            { value: "32%", label: "Acceptance Rate" },
-            { value: "4-6 weeks", label: "Review Time" },
+            {
+              value: `${data?.impact_factor || "N/A"}`,
+              label: "Impact Factor",
+            },
+            { value: `${data?.h_index || "N/A"}`, label: "H-Index" },
+            {
+              value: `${data?.citation_score || "N/A"}`,
+              label: "Citation Score",
+            },
+            {
+              value: `${data?.acceptance_rate || "N/A"}`,
+              label: "Acceptance Rate",
+            },
+            { value: `${data?.review_time || "N/A"}`, label: "Review Time" },
           ].map((item, i) => (
             <div key={i}>
               <p className="text-[#01D4FF] text-[22px] md:text-[34px] font-semibold">
@@ -103,12 +151,12 @@ function JournalDetails() {
       </div>
 
       {/* ================= CONTENT AREA ================= */}
-      <JournalSection />
+      <JournalSection data={data} />
     </div>
   );
 }
 
-function JournalSection() {
+function JournalSection({ data }) {
   const [activeTab, setActiveTab] = useState("About");
 
   const tabs = [
@@ -147,7 +195,7 @@ function JournalSection() {
               About the Journal
             </h2>
 
-            <p className="text-[14px] md:text-[18px] text-[#133C49] mb-4 ">
+            {/* <p className="text-[14px] md:text-[18px] text-[#133C49] mb-4 ">
               A peer-reviewed journal covering all aspects of engineering
               sciences including mechanical, civil, electrical, and chemical
               engineering.
@@ -158,7 +206,14 @@ function JournalSection() {
               ensure the highest quality of published research. We are committed
               to rapid publication while maintaining academic integrity and
               ethical publishing standards.
-            </p>
+            </p> */}
+            {data?.about_content ? (
+              <p className="text-[14px] md:text-[18px] text-[#133C49]">
+                {data?.about_content}
+              </p>
+            ) : (
+              ""
+            )}
           </div>
         )}
 
@@ -192,7 +247,7 @@ function JournalSection() {
 
         {activeTab === "Editorial Board" && <EditorialBoard />}
         {activeTab === "Articles" && <ArticlesSection />}
-        {activeTab === "Author Guidelines" && <AuthorGuidelines />}
+        {activeTab === "Author Guidelines" && <AuthorGuidelines data={data} />}
         {activeTab === "Indexing & Metrics" && <IndexingMetrics />}
       </div>
     </div>
@@ -382,7 +437,7 @@ function ArticlesSection() {
   );
 }
 
-function AuthorGuidelines() {
+function AuthorGuidelines({ data }) {
   return (
     <div>
       {/* CARD */}

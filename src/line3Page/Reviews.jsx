@@ -50,6 +50,8 @@ function ReviewerSection() {
       desc: "The editor makes the final decision based on all reviewer recommendations.",
     },
   ];
+
+  const navigate = useNavigate();
   return (
     <div className="max-w-7xl mx-auto py-12 space-y-12">
       {/* ================= WHY REVIEW ================= */}
@@ -245,11 +247,17 @@ function ReviewerSection() {
         </p>
 
         <div className="flex justify-center gap-4">
-          <button className="bg-[#01D4FF] text-[#13404F] px-[16px] py-[8px] rounded-[12px] text-[14px]">
+          <button
+            onClick={() => navigate("/journals/submit-manuscript")}
+            className="bg-[#01D4FF] text-[#13404F] px-[16px] py-[8px] rounded-[12px] text-[14px]"
+          >
             Register as Reviewer
           </button>
 
-          <button className="bg-[#133C49] border border-[#235262] px-[16px] py-[8px] rounded-[12px] text-[14px] hover:bg-[#2E5C66]">
+          <button
+            onClick={() => navigate("/journals/editorial")}
+            className="bg-[#133C49] border border-[#235262] px-[16px] py-[8px] rounded-[12px] text-[14px] hover:bg-[#2E5C66]"
+          >
             View Editorial Board
           </button>
         </div>

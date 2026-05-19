@@ -4,10 +4,20 @@ import FirstLine from "./containers/FirstLine";
 import SecondLine from "./containers/SecondLine";
 import ThirdLine from "./containers/ThirdLine";
 import WhatsAppFloat from "./components/WhatsAppFloat";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       <Routes>
         {/* <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -19,7 +29,7 @@ export default function App() {
 
         <Route path="/" element={<Navigate to="/main" replace />} />
         <Route path="/main/*" element={<FirstLine />} />
-        <Route path="/conference/*" element={<SecondLine />} />
+        <Route path="/conference/:slug/*" element={<SecondLine />} />
         <Route path="/journals/*" element={<ThirdLine />} />
 
         {/*<Route path="/conferences" element={<div>Conferences</div>} />

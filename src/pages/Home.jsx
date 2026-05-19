@@ -10,90 +10,118 @@ import {
 } from "lucide-react";
 import Testimonials from "../components/Testimonials";
 import HeroSectionMobile from "../components/HeroSectionMobile";
+import { useNavigate } from "react-router-dom";
+import http from "../service/http";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Autoplay } from "swiper/modules";
 
-const Home = () => {
-  const events = [
-    {
-      id: 1,
-      title: "Business World Event Introduction",
-      time: "10.00 AM - 12.00 PM",
-      location: "26/C Asana, New York",
-      image: "/b1.png",
-      speakers: [
-        {
-          name: "Alex Roberton",
-          role: "UI/UX Designer",
-          img: "/p1.jpg",
-        },
-        {
-          name: "Alexys Archer",
-          role: "WP Developer",
-          img: "/p2.jpg",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Digital Marketing Conference",
-      time: "01.00 PM - 03.00 PM",
-      location: "New Jersey Hall",
-      image: "/b2.png",
-      speakers: [
-        {
-          name: "John Smith",
-          role: "Marketing Lead",
-          img: "/p1.jpg",
-        },
-        {
-          name: "Emma Watson",
-          role: "SEO Expert",
-          img: "/p2.jpg",
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: "Startup Growth Summit",
-      time: "04.00 PM - 06.00 PM",
-      location: "Silicon Valley",
-      image: "/b1.png",
-      speakers: [
-        {
-          name: "David Warner",
-          role: "Founder",
-          img: "/p1.jpg",
-        },
-        {
-          name: "Lisa Ray",
-          role: "Investor",
-          img: "/p2.jpg",
-        },
-      ],
-    },
-    {
-      id: 4,
-      title: "Tech Innovation Meetup",
-      time: "07.00 PM - 09.00 PM",
-      location: "San Francisco",
-      image: "/b2.png",
-      speakers: [
-        {
-          name: "Chris Evans",
-          role: "Engineer",
-          img: "/p1.jpg",
-        },
-        {
-          name: "Sophia Lee",
-          role: "Product Manager",
-          img: "/p2.jpg",
-        },
-      ],
-    },
-  ];
+const Home = ({ data, events }) => {
+  console.log("core data:-", data);
+  // const [data, setData] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  // const [events, setEvents] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchCore = async () => {
+  //     try {
+  //       const res = await http.get("/core/");
+  //       setData(res.data);
+  //       setEvents(res.data.gallery_events); // ✅ store full API response
+  //     } catch (err) {
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchCore();
+  // }, []);
+  // const events = [
+  //   {
+  //     id: 1,
+  //     title: "Business World Event Introduction",
+  //     time: "10.00 AM - 12.00 PM",
+  //     location: "26/C Asana, New York",
+  //     image: "/b1.png",
+  //     speakers: [
+  //       {
+  //         name: "Alex Roberton",
+  //         role: "UI/UX Designer",
+  //         img: "/p1.jpg",
+  //       },
+  //       {
+  //         name: "Alexys Archer",
+  //         role: "WP Developer",
+  //         img: "/p2.jpg",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Digital Marketing Conference",
+  //     time: "01.00 PM - 03.00 PM",
+  //     location: "New Jersey Hall",
+  //     image: "/b2.png",
+  //     speakers: [
+  //       {
+  //         name: "John Smith",
+  //         role: "Marketing Lead",
+  //         img: "/p1.jpg",
+  //       },
+  //       {
+  //         name: "Emma Watson",
+  //         role: "SEO Expert",
+  //         img: "/p2.jpg",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Startup Growth Summit",
+  //     time: "04.00 PM - 06.00 PM",
+  //     location: "Silicon Valley",
+  //     image: "/b1.png",
+  //     speakers: [
+  //       {
+  //         name: "David Warner",
+  //         role: "Founder",
+  //         img: "/p1.jpg",
+  //       },
+  //       {
+  //         name: "Lisa Ray",
+  //         role: "Investor",
+  //         img: "/p2.jpg",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Tech Innovation Meetup",
+  //     time: "07.00 PM - 09.00 PM",
+  //     location: "San Francisco",
+  //     image: "/b2.png",
+  //     speakers: [
+  //       {
+  //         name: "Chris Evans",
+  //         role: "Engineer",
+  //         img: "/p1.jpg",
+  //       },
+  //       {
+  //         name: "Sophia Lee",
+  //         role: "Product Manager",
+  //         img: "/p2.jpg",
+  //       },
+  //     ],
+  //   },
+  // ];
+  const navigate = useNavigate();
+
+  const images = ["/c3.png", "/c1.png", "/c2.png", "/c4.png"];
   return (
     <div>
       {/* <HeroSection /> */}
-      <HeroSectionWrapper />
+      <HeroSectionWrapper data={data} />
       <section className="bg-[#0f3b3f] text-white py-16 px-6 md:px-16">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           {/* LEFT IMAGE GRID */}
@@ -185,27 +213,61 @@ const Home = () => {
           </h3>
 
           {/* Logos Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Card 1 */}
+          {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
             <div className="flex items-center justify-center gap-3 bg-[#FFFFFF0F] px-[66px] py-[32px] rounded-xl">
               <img src="/c3.png" alt="" className="w-[166px] h-[48px]" />
             </div>
 
-            {/* Card 2 */}
+            
             <div className="flex items-center justify-center gap-3 bg-[#FFFFFF0F] px-[66px] py-[32px] rounded-xl">
               <img src="/c1.png" alt="" className="w-[166px] h-[48px]" />
             </div>
 
-            {/* Card 3 */}
+            
             <div className="flex items-center justify-center gap-3 bg-[#FFFFFF0F] px-[66px] py-[32px] rounded-xl">
               <img src="/c2.png" alt="" className="w-[166px] h-[48px]" />
             </div>
 
-            {/* Card 4 */}
+           
             <div className="flex items-center justify-center gap-3 bg-[#FFFFFF0F] px-[66px] py-[32px] rounded-xl">
               <img src="/c4.png" alt="" className="w-[166px] h-[48px]" />
             </div>
-          </div>
+          </div> */}
+          <Swiper
+            modules={[Autoplay]}
+            spaceBetween={20}
+            slidesPerView={4}
+            loop={true}
+            allowTouchMove={true} // manual control also works
+            speed={4000} // IMPORTANT: higher = smoother continuous scroll
+            autoplay={{
+              delay: 0, // no delay
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false, // never stop on hover
+            }}
+            freeMode={true} // 🔥 KEY for smooth continuous movement
+            freeModeMomentum={false}
+            breakpoints={{
+              0: { slidesPerView: 1 },
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 4 },
+            }}
+            className="!ease-linear" // smooth linear motion
+          >
+            {[...images, ...images].map(
+              (
+                img,
+                i, // duplicate for seamless loop
+              ) => (
+                <SwiperSlide key={i}>
+                  <div className="flex items-center justify-center bg-[#FFFFFF0F] px-[66px] py-[32px] rounded-xl">
+                    <img src={img} alt="" className="w-[166px] h-[48px]" />
+                  </div>
+                </SwiperSlide>
+              ),
+            )}
+          </Swiper>
         </div>
       </section>
 
@@ -223,14 +285,18 @@ const Home = () => {
 
           {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            {events.map((event) => (
+            {events?.map((event) => (
               <div
                 key={event.id}
-                className="bg-[#154351] rounded-2xl p-4 flex flex-col sm:flex-row gap-4"
+                className="group relative bg-[#154351] rounded-2xl p-4 flex flex-col sm:flex-row gap-4 
+                transition-all duration-500 ease-out 
+                hover:scale-[1.02] 
+                hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] 
+                border border-transparent hover:border-[#01D4FF]"
               >
                 {/* Image */}
                 <img
-                  src={event.image}
+                  src={"/b1.png"}
                   alt=""
                   className="w-full sm:w-[160px] md:w-[190px] h-[190px] object-cover rounded-xl"
                 />
@@ -244,7 +310,7 @@ const Home = () => {
                       <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20">
                         <Clock size={12} strokeWidth={2.5} />
                       </span>
-                      {event.time}
+                      {event.event_date}
                     </div>
 
                     {/* Divider */}
@@ -255,7 +321,8 @@ const Home = () => {
                       <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20">
                         <MapPin size={12} strokeWidth={2.5} />
                       </span>
-                      {event.location}
+                      {/* {event.location} */}
+                      26/C Asana, New York
                     </div>
                   </div>
 
@@ -266,7 +333,7 @@ const Home = () => {
 
                   {/* Speakers */}
                   <div className="flex flex-col sm:flex-row gap-3 mb-4 bg-[#133C49] rounded-xl p-2">
-                    {event.speakers.map((sp, i) => (
+                    {/* {event.speakers.map((sp, i) => (
                       <div
                         key={i}
                         className="flex items-center gap-3 px-2 py-2"
@@ -284,11 +351,31 @@ const Home = () => {
                           </p>
                         </div>
                       </div>
-                    ))}
+                    ))} */}
+
+                    <div className="flex items-center gap-3 px-2 py-2">
+                      <img
+                        src={"/p2.jpg"}
+                        className="w-10 h-10 sm:w-[45px] sm:h-[45px] rounded-lg object-cover"
+                      />
+                      <div className="space-y-2">
+                        <p className="text-[12px] sm:text-[13px] font-semibold">
+                          Chris Evans
+                        </p>
+                        <p className="text-[10px] text-[#a9c3c7]">
+                          Product Manager
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Button */}
-                  <button className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] text-[12px] sm:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#00c2ea] transition">
+                  <button
+                    onClick={() =>
+                      navigate(`/conference/${data?.conferences[0]?.slug}`)
+                    }
+                    className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] text-[12px] sm:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#00c2ea] transition"
+                  >
                     RESERVE MY SEAT
                     <span className="w-5 h-5 flex items-center justify-center bg-white text-black rounded-full text-xs">
                       →
@@ -301,8 +388,9 @@ const Home = () => {
         </div>
       </section>
 
-      <BlogSection />
-      <Testimonials />
+      {/* <BlogSection /> */}
+      <BlogSection blogs={data?.blogs || []} />
+      <Testimonials testimonials={data?.testimonials || []} />
       <Gallery />
     </div>
   );
@@ -310,7 +398,7 @@ const Home = () => {
 
 export default Home;
 
-function HeroSectionWrapper() {
+function HeroSectionWrapper({ data }) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -321,10 +409,15 @@ function HeroSectionWrapper() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  return isMobile ? <HeroSectionMobile /> : <HeroSection />;
+  return isMobile ? (
+    <HeroSectionMobile data={data} />
+  ) : (
+    <HeroSection data={data} />
+  );
 }
 
-function HeroSection() {
+function HeroSection({ data }) {
+  console.log("data of confrerence:-", data?.conferences[0]?.slug);
   const targetDate = new Date("2026-03-30T18:00:00").getTime();
 
   const [timeLeft, setTimeLeft] = useState(getTime());
@@ -355,6 +448,29 @@ function HeroSection() {
         : "text-gray-600 hover:text-[#0b3c44]"
     }`;
 
+  const slidesData = [
+    {
+      title: "Yearly Business",
+      conferences: "“ 26 ”",
+      tagline: "Lead Purpose, Innovate with Passion",
+      image: "/b.png",
+    },
+    {
+      title: "Tech Events",
+      conferences: "“ 18 ”",
+      tagline: "Build Future with Innovation",
+      image: "/b.png",
+    },
+    {
+      title: "Digital World",
+      conferences: "Meetup",
+      tagline: "Build Future with Innovation",
+      image: "/b.png",
+    },
+  ];
+
+  const navigate = useNavigate();
+
   return (
     <div className="w-full min-h-screen bg-[#0B2C36] text-white relative overflow-hidden">
       <div>
@@ -364,43 +480,21 @@ function HeroSection() {
           className="absolute top-0 right-0 z-50"
         />
       </div>
-      {/* ✅ HEADER FIXED */}
-      {/* <header className="fixed top-0 left-0 w-full z-[999] flex justify-center">
-        <div className="w-[90%] flex items-center justify-between px-10 py-4 bg-white text-black rounded-b-3xl shadow-md">
-          
-          <div className="flex items-center gap-2 font-bold text-lg">
-            <img src="/logo.png" className="h-[50px]" />
-          </div>
 
-          
-          <nav className="flex gap-8 text-[18px] font-medium">
-            <a className="text-[#0b3c44] font-semibold">Home</a>
-            <a>About Us</a>
-            <a>Conferences</a>
-            <a>Journals</a>
-            <a>Blogs</a>
-            <a>Gallery</a>
-            <a>Contact Us</a>
-          </nav>
-        </div>
-      </header> */}
-
-      {/* <Header /> */}
-
-      <div className="grid md:grid-cols-2 items-center h-screen">
-        {/* LEFT */}
+      {/* <div className="grid md:grid-cols-2 items-center h-screen">
+       
         <div className="px-24 pt-10">
-          {/* TAGLINE */}
+         
           <p className="inline-block bg-[#0f4d57] text-[#38d9ff] px-5 py-2 rounded-full text-sm mb-8 tracking-wide">
             Lead Purpose, Innovate with Passion
           </p>
 
-          {/* HEADING */}
+         
           <h1 className="text-[56px] leading-[1.2] font-light text-white mb-6">
             Yearly Business
           </h1>
 
-          {/* CONFERENCE TEXT */}
+          
           <div className="flex items-center gap-6 mb-8">
             <span className="text-[40px] font-semibold border border-[#38d9ff] px-6 py-2 rounded-xl text-[#38d9ff] tracking-wide">
               CONFERENCES
@@ -409,8 +503,11 @@ function HeroSection() {
             <span className="text-[34px] text-white font-light">“ 26 ”</span>
           </div>
 
-          {/* BUTTON */}
-          <button className="flex items-center gap-3 bg-[#38d9ff] text-[#00343a] px-6 py-3 rounded-full text-sm font-semibold shadow-md hover:bg-[#22c7ee] transition">
+          
+          <button
+            onClick={() => navigate("/journals/submit-manuscript")}
+            className="flex items-center gap-3 bg-[#38d9ff] text-[#00343a] px-6 py-3 rounded-full text-sm font-semibold shadow-md hover:bg-[#22c7ee] transition"
+          >
             RESERVE MY SEAT
             <span className="w-6 h-6 flex items-center justify-center bg-white text-black rounded-full text-xs">
               →
@@ -418,14 +515,72 @@ function HeroSection() {
           </button>
         </div>
 
-        {/* RIGHT IMAGE WITH DIAGONAL CUT */}
+        
         <div className="relative h-full">
           <img src="/b.png" className="w-full h-[732px] object-cover" />
-
-          {/* 🔥 DIAGONAL SHAPE (important fix) */}
-          {/* <div className="absolute inset-0 bg-[#0b3c44] clip-diagonal"></div> */}
         </div>
-      </div>
+      </div> */}
+
+      <Swiper
+        className="flex-1"
+        modules={[Autoplay]}
+        slidesPerView={1}
+        loop={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+      >
+        {slidesData.map((slide, index) => (
+          <SwiperSlide key={index}>
+            <div className="grid md:grid-cols-2 items-center h-screen">
+              {/* LEFT */}
+              <div className="px-24 pt-10">
+                <p className="inline-block bg-[#0f4d57] text-[#38d9ff] px-5 py-2 rounded-full text-sm mb-8 tracking-wide">
+                  {slide.tagline}
+                </p>
+
+                <h1 className="text-[56px] leading-[1.2] font-medium text-white mb-6">
+                  {slide.title}
+                </h1>
+
+                <div className="flex items-center gap-6 mb-8">
+                  <span className="text-[40px] bg-[#FFFFFF26] font-semibold border border-[#38d9ff] px-6 py-2 rounded-xl text-[#38d9ff] tracking-wide">
+                    CONFERENCES
+                  </span>
+
+                  <span className="text-[56px] text-white font-medium">
+                    {slide.conferences}
+                  </span>
+                </div>
+
+                {/* <button className="flex items-center gap-3 bg-[#38d9ff] text-[#00343a] px-6 py-3 rounded-full text-sm font-semibold">
+                  RESERVE MY SEAT
+                </button> */}
+                <button
+                  onClick={() =>
+                    navigate(`/conference/${data?.conferences[0]?.slug}`)
+                  }
+                  className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] px-6 py-3 rounded-full text-[14px] font-semibold shadow-md hover:bg-[#22c7ee] transition"
+                >
+                  RESERVE MY SEAT
+                  <span className="w-6 h-6 flex items-center justify-center bg-white text-black rounded-full text-xs">
+                    →
+                  </span>
+                </button>
+              </div>
+
+              {/* RIGHT */}
+              <div className="relative h-full">
+                <img
+                  src={slide.image}
+                  className="w-full h-[732px] object-cover"
+                />
+              </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       {/* ✅ COUNTDOWN CENTERED */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[65%] z-[50]">
@@ -482,40 +637,41 @@ function HeroSection() {
   );
 }
 
-const blogs = [
-  {
-    id: 1,
-    image: "/b12.png",
-    author: "John Carter",
-    avatar: "/p1.jpg",
-    date: "29 Dec, 2025",
-    title:
-      "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
-    desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
-  },
-  {
-    id: 2,
-    image: "/b2.png",
-    author: "John Carter",
-    avatar: "/p1.jpg",
-    date: "29 Dec, 2025",
-    title:
-      "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
-    desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
-  },
-  {
-    id: 3,
-    image: "/b3.png",
-    author: "John Carter",
-    avatar: "/p1.jpg",
-    date: "29 Dec, 2025",
-    title:
-      "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
-    desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
-  },
-];
+// const blogs = [
+//   {
+//     id: 1,
+//     image: "/b12.png",
+//     author: "John Carter",
+//     avatar: "/p1.jpg",
+//     date: "29 Dec, 2025",
+//     title:
+//       "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
+//     desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
+//   },
+//   {
+//     id: 2,
+//     image: "/b2.png",
+//     author: "John Carter",
+//     avatar: "/p1.jpg",
+//     date: "29 Dec, 2025",
+//     title:
+//       "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
+//     desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
+//   },
+//   {
+//     id: 3,
+//     image: "/b3.png",
+//     author: "John Carter",
+//     avatar: "/p1.jpg",
+//     date: "29 Dec, 2025",
+//     title:
+//       "Highlights from CGT Summit 2025: A Step Forward in Cell & Gene Therapy",
+//     desc: "The 2nd Global Cell & Gene Therapy (CGT) Summit was held from July 7–9, 2025, in Orlando, Florida, and brought together an exceptional lineup of scientists, clinicians, industry leaders, regulatory authorities, and innovators from around the world...",
+//   },
+// ];
 
-function BlogSection() {
+function BlogSection({ blogs }) {
+  const navigate = useNavigate();
   return (
     <section className="bg-[#154351] py-16 px-6 md:px-16 text-white">
       <div className="max-w-7xl mx-auto text-center">
@@ -538,7 +694,10 @@ function BlogSection() {
 
         {/* Button */}
         <div className="mt-12 flex justify-center">
-          <button className="flex items-center gap-4 bg-[#01D4FF] text-[#00343a] text-[14px] font-semibold px-8 py-4 rounded-full shadow-sm hover:bg-[#00c2ea] transition">
+          <button
+            onClick={() => navigate("/main/blogs")}
+            className="flex items-center gap-4 bg-[#01D4FF] text-[#00343a] text-[14px] font-semibold px-8 py-4 rounded-full shadow-sm hover:bg-[#00c2ea] transition"
+          >
             View More
             <span className="w-7 h-7 flex items-center justify-center bg-white text-black rounded-full text-sm">
               →
@@ -552,7 +711,7 @@ function BlogSection() {
 
 const BlogCard = ({ blog }) => {
   return (
-    <div className="bg-[#13404F] backdrop-blur-md rounded-2xl p-4  hover:shadow-[0_15px_40px_rgba(0,0,0,0.3)] transition">
+    <div className="bg-[#13404F] backdrop-blur-md rounded-2xl p-4 cursor-pointer transition-all border border-transparent hover:border-[#01D4FF]">
       {/* Image */}
       <img
         src={blog.image}
@@ -562,13 +721,13 @@ const BlogCard = ({ blog }) => {
 
       {/* Meta */}
       <div className="flex items-center gap-2 text-[12px] text-gray-300 mb-2">
-        <img src={blog.avatar} className="w-[20px] h-[20px] rounded-[4px]" />
+        <img src={"/p1.jpg"} className="w-[20px] h-[20px] rounded-[4px]" />
         <span className="font-normal text-[14px] text-[#FFFFFF]/70">
-          {blog.author}
+          {blog.author_name}
         </span>
         <span className="text-[#FFFFFF]/70 text-[14px] font-normal">•</span>
         <span className="text-[#FFFFFF]/70 text-[14px] font-normal">
-          {blog.date}
+          {blog.published_at}
         </span>
       </div>
 
@@ -579,7 +738,7 @@ const BlogCard = ({ blog }) => {
 
       {/* Description */}
       <p className="text-[14px] text-start text-[#FFFFFF]/70 font-normal leading-relaxed line-clamp-3">
-        {blog.desc}
+        {blog.summary}
       </p>
     </div>
   );
@@ -613,6 +772,26 @@ const galleryData = [
 ];
 
 function Gallery() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await http.get("/gallery");
+        const data = res.data;
+
+        setItems(data.results || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGallery();
+  }, []);
   return (
     <section className="bg-[#133C49] py-16 px-6 md:px-16 text-white">
       <div className="max-w-7xl mx-auto text-center">
@@ -620,20 +799,20 @@ function Gallery() {
         <h2 className="text-3xl md:text-4xl font-semibold mb-12">Gallery</h2>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-left">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-left">
           {galleryData.map((item) => (
             <div
               key={item.id}
               className="bg-[#13404F] rounded-2xl overflow-hidden hover:-translate-y-1 transition"
             >
-              {/* Image */}
+              
               <img
                 src={item.image}
                 alt={item.title}
                 className="w-full h-[180px] object-cover"
               />
 
-              {/* Content */}
+              
               <div className="p-4">
                 <h3 className="text-[14px] text-[#FFFFFF] font-medium mb-2">
                   {item.title}
@@ -648,11 +827,74 @@ function Gallery() {
               </div>
             </div>
           ))}
-        </div>
+          
+        </div> */}
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-left">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="group bg-[#13404F] rounded-2xl overflow-hidden 
+                transition-all duration-300 hover:-translate-y-1 text-[#FFFFFF]  hover:text-[#01D4FF]"
+              >
+                {/* Image Wrapper */}
+                <div className="relative">
+                  {item.preview_image ? (
+                    <img
+                      src={item.preview_image}
+                      alt={item.title}
+                      className="w-full h-[180px] object-cover 
+                      transition duration-500 group-hover:blur-xs group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-[180px] bg-gray-700 flex items-center justify-center text-sm text-gray-300">
+                      No Image
+                    </div>
+                  )}
+
+                  {/* 🔥 Hover Overlay Button */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center
+                    opacity-0 group-hover:opacity-100 transition duration-300"
+                  >
+                    <button
+                      onClick={() => navigate("/main/gallery")}
+                      className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] 
+                        text-[13px] font-semibold px-5 py-2.5 rounded-full 
+                        shadow-lg hover:bg-[#00c2ea] transition"
+                    >
+                      View gallery
+                      <span className="w-5 h-5 flex items-center justify-center bg-white text-black rounded-full text-xs">
+                        →
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="text-[14px]  font-medium mb-2">
+                    {item.title}
+                  </h3>
+
+                  <div className="flex items-center gap-2 text-[12px] text-[#FFFFFF]/70">
+                    <CalendarDays size={16} strokeWidth={2.5} />
+                    <span>{item.event_date}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Button */}
         <div className="mt-12 flex justify-center">
-          <button className="flex items-center gap-4 bg-[#01D4FF] text-[#00343a] text-[14px] font-semibold px-8 py-4 rounded-full shadow-sm hover:bg-[#00c2ea] transition">
+          <button
+            onClick={() => navigate("/main/gallery")}
+            className="flex items-center gap-4 bg-[#01D4FF] text-[#00343a] text-[14px] font-semibold px-8 py-4 rounded-full shadow-sm hover:bg-[#00c2ea] transition"
+          >
             View More
             <span className="w-7 h-7 flex items-center justify-center bg-white text-black rounded-full text-sm">
               →

@@ -1,6 +1,34 @@
 import { ArrowLeft, CalendarDays, Clock, MapPin } from "lucide-react";
+import http from "../service/http";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function SpeakerDetails() {
+  const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const id = searchParams.get("id");
+
+  const [speaker, setSpeaker] = useState(null);
+
+  useEffect(() => {
+    const fetchSpeaker = async () => {
+      try {
+        const res = await http.get(`/speakers/${slug}/${id}/`);
+        setSpeaker(res.data.speaker);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (slug && id) {
+      fetchSpeaker();
+    }
+  }, [slug, id]);
+
+  if (!speaker) {
+    return <div className="text-center mt-40">Loading...</div>;
+  }
   return (
     <div className="w-full min-h-screen bg-[#E7F9FF] py-10 pt-40 flex justify-center">
       <div className="w-[90%] ">
@@ -17,24 +45,27 @@ export default function SpeakerDetails() {
             {/* Image */}
             <div className="w-[244px] h-[244px] flex justify-center mb-4">
               <img
-                src="/t3.png"
-                alt="Alex Smith"
+                src={speaker.photo}
+                alt={speaker.name}
                 className="w-full h-full object-cover"
               />
             </div>
 
             {/* Name */}
             <h3 className="font-semibold text-white text-[20px] mb-1">
-              Alex Smith
+              {speaker.name}
             </h3>
 
             {/* Role */}
             <p className="text-[14px] text-[#FFFFFF]/70">
-              Founder, Info Technologies
+              {speaker.designation}
             </p>
 
             {/* Tag */}
-            <p className="text-[14px] text-[#FFFFFF]">Keynote Speaker</p>
+            <p className="text-[14px] text-[#FFFFFF]">
+              {" "}
+              {speaker.speaker_type || speaker.role}
+            </p>
 
             {/* Socials */}
             <div className="flex justify-center gap-3 mt-4">
@@ -53,24 +84,17 @@ export default function SpeakerDetails() {
               </h3>
 
               <p className="text-[#4F5C60] text-[20px] leading-relaxed">
-                Alex Smith is a world-renowned interventional cardiologist with
-                over 25 years of experience in complex coronary interventions.
-                He serves as the Chief of Cardiology at Stanford Medical Center
-                and has published over 200 peer-reviewed articles. His
-                groundbreaking work in AI-assisted cardiac imaging has
-                revolutionized how we diagnose and treat heart disease. Dr.
-                Miller has been recognized with numerous awards including the
-                American Heart Association's Distinguished Achievement Award.
+                {speaker.bio || "No biography available"}
               </p>
             </div>
 
             {/* Sessions */}
-            <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
+            {/* <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
               <h3 className="text-[#00849F] text-[20px] font-semibold mb-4">
                 Speaking Sessions
               </h3>
 
-              {/* Session 1 */}
+             
               <div className="bg-[#D5F4FF] rounded-[16px] p-[24px] mb-4 border border-[#C6E4EF]">
                 <h4 className="text-[#133C49] text-[20px] font-semibold mb-2">
                   Keynote: The Future of AI in Cardiovascular Medicine
@@ -136,7 +160,7 @@ export default function SpeakerDetails() {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

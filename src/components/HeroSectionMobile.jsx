@@ -30,7 +30,7 @@ export default function HeroSectionMobile() {
     <div className="bg-[#0B2C36] text-white min-h-screen relative">
       {/* IMAGE */}
       <div className="w-full">
-        <img src="/mobile.jpg" className="w-full h-[260px] object-cover" />
+        <img src="/mobile.jpg" className="w-full min-h-[60vh] object-cover" />
       </div>
 
       {/* CONTENT */}

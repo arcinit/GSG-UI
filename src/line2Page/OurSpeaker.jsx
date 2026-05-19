@@ -1,10 +1,10 @@
 import { Phone, Mail, MessageCircle } from "lucide-react";
 import TeamSectionSpeaker from "../line2Components/TeamSectionSpeaker";
-const OurSpeaker = () => {
+const OurSpeaker = ({ data }) => {
   return (
     <div className="bg-[#E7F9FF]">
       <SpeakerHero />
-      <TeamSectionSpeaker />
+      <TeamSectionSpeaker data={data} />
     </div>
   );
 };

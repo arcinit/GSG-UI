@@ -1,6 +1,7 @@
 import { Search, Folder, Tag, CalendarDays } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import http from "../service/http";
 
 const galleryItems = [
   {
@@ -30,19 +31,52 @@ const galleryItems = [
 ];
 
 export default function GallaryPage() {
-  const ITEMS_PER_PAGE = 4;
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [search, setSearch] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500); // wait 500ms
 
-  const totalPages = Math.ceil(galleryItems.length / ITEMS_PER_PAGE);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = galleryItems.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
+  useEffect(() => {
+    fetchGallery();
+  }, [currentPage, selectedCategory, debouncedSearch]);
 
+  const fetchGallery = async () => {
+    setLoading(true); // ✅ IMPORTANT
+
+    try {
+      const res = await http.get("/gallery", {
+        params: {
+          page: currentPage,
+          category: selectedCategory,
+          search: debouncedSearch,
+        },
+      });
+
+      const data = res.data;
+
+      setItems(data.results || []);
+      setCategories(data.categories || []);
+      setTotalPages(data.num_pages || 1); // ✅ added
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   const navigate = useNavigate();
+
   return (
     <section className=" py-10 px-4 md:px-10">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-[320px_1fr] gap-8">
@@ -51,11 +85,20 @@ export default function GallaryPage() {
           {/* Search */}
           <div className="flex items-center bg-[#13404F] border border-[#235262] backdrop-blur-md rounded-[12px] px-3 py-2 w-full max-w-sm">
             {/* INPUT */}
+            {/* <input
+              placeholder="Search Here"
+              className="flex-1 bg-transparent outline-none text-[13px] text-white placeholder:text-white/60 p-[12px] rounded-[14px] border border-[#235262] "
+            /> */}
+
             <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               placeholder="Search Here"
               className="flex-1 bg-transparent outline-none text-[13px] text-white placeholder:text-white/60 p-[12px] rounded-[14px] border border-[#235262] "
             />
-
             {/* BUTTON */}
             <button className="ml-2 w-[44px] h-[44px]  transition">
               <img src="/s.png" alt="" className="w-full h-full" />
@@ -69,7 +112,7 @@ export default function GallaryPage() {
             </h3>
 
             <div className="space-y-3 text-[14px] font-normal">
-              {[
+              {/* {[
                 "Business Event",
                 "Design Conference",
                 "Marketing events",
@@ -83,6 +126,37 @@ export default function GallaryPage() {
                   <Folder size={14} />
                   {item}
                 </div>
+              ))} */}
+              <div
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setCurrentPage(1);
+                }}
+                className={`flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer ${
+                  selectedCategory === null
+                    ? "bg-[#01D4FF] text-black"
+                    : "border-[#1e555a]"
+                }`}
+              >
+                <Folder size={14} />
+                All
+              </div>
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setCurrentPage(1);
+                  }}
+                  className={`flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer ${
+                    selectedCategory === cat.id
+                      ? "bg-[#01D4FF] text-black"
+                      : "border-[#1e555a]"
+                  }`}
+                >
+                  <Folder size={14} />
+                  {cat.name}
+                </div>
               ))}
             </div>
           </div>
@@ -91,13 +165,13 @@ export default function GallaryPage() {
         {/* ================= BLOG GRID ================= */}
         <div>
           <div className="grid sm:grid-cols-3 gap-4">
-            {currentItems.map((blog) => (
+            {/* {currentItems.map((blog) => (
               <div
                 key={blog.id}
                 onClick={() => navigate(`/gallery-details?id=${blog.id}`)}
                 className="bg-[#D5F4FF] rounded-[24px]  overflow-hidden w-full max-w-sm"
               >
-                {/* IMAGE */}
+                
                 <div className="">
                   <img
                     src={blog.image}
@@ -105,14 +179,14 @@ export default function GallaryPage() {
                   />
                 </div>
 
-                {/* CONTENT */}
+                
                 <div className="px-4 py-4">
-                  {/* TITLE */}
+                  
                   <h3 className="text-[#133C49] text-[14px] font-medium mb-2">
                     {blog.title}
                   </h3>
 
-                  {/* DATE */}
+                 
                   <div className="flex items-center gap-2 text-[#6b8b93] text-[12px]">
                     <span className="w-[16px] h-[16px]">
                       <CalendarDays size={12} />
@@ -122,7 +196,92 @@ export default function GallaryPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            ))} */}
+            {/* {loading ? (
+              <div className="col-span-3 text-center py-10">Loading...</div>
+            ) : (
+              items.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    navigate(`/main/gallery-details?id=${item.id}`)
+                  }
+                  className="bg-[#D5F4FF] rounded-[24px] overflow-hidden w-full max-w-sm"
+                >
+                  
+                  <img
+                    src={item.preview_image || "/b12.png"}
+                    className="w-full h-[180px] object-cover rounded-t-[14px]"
+                  />
+
+                  <div className="px-4 py-4">
+                    <h3 className="text-[#133C49] text-[14px] font-medium mb-2">
+                      {item.title}
+                    </h3>
+
+                    <div className="flex items-center gap-2 text-[#6b8b93] text-[12px]">
+                      <CalendarDays size={12} />
+                      <span>{new Date(item.event_date).toDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )} */}
+            {loading ? (
+              <div className="col-span-3 text-center py-10">Loading...</div>
+            ) : (
+              items.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    navigate(`/main/gallery-details?id=${item.id}`)
+                  }
+                  className="bg-[#D5F4FF] text-[#133C49] hover:text-[#00C2E0] rounded-[24px] overflow-hidden w-full max-w-sm cursor-pointer group"
+                >
+                  {/* IMAGE WRAPPER */}
+                  <div className="relative">
+                    {/* Image */}
+                    <img
+                      src={item.preview_image || "/b12.png"}
+                      className="w-full h-[180px] object-cover rounded-t-[14px]"
+                    />
+
+                    {/* HOVER OVERLAY */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center
+                        bg-black/30 backdrop-blur-xs
+                        opacity-0 group-hover:opacity-100
+                        transition duration-300"
+                    >
+                      {/* BUTTON */}
+                      <button
+                        onClick={() => navigate("/main/gallery")}
+                        className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] 
+                        text-[13px] font-semibold px-5 py-2.5 rounded-full 
+                        shadow-lg hover:bg-[#00c2ea] transition"
+                      >
+                        View gallery
+                        <span className="w-5 h-5 flex items-center justify-center bg-white text-black rounded-full text-xs">
+                          →
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="px-4 py-4">
+                    <h3 className=" text-[14px] font-semibold mb-2">
+                      {item.title}
+                    </h3>
+
+                    <div className="flex items-center gap-2 text-[#6b8b93] text-[12px]">
+                      <CalendarDays size={12} />
+                      <span>{new Date(item.event_date).toDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-12 px-2">
             {/* PREV */}

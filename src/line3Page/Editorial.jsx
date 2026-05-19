@@ -1,11 +1,16 @@
 import { Phone, Mail, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Editorial = () => {
+const Editorial = ({ editorial: data }) => {
+  console.log(data);
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className="bg-[#E7F9FF]">
       <JournalsHero />
-      <EditorialBoardPage />
+      <EditorialBoardPage data={data?.results} />
     </div>
   );
 };
@@ -32,7 +37,7 @@ function JournalsHero() {
   );
 }
 
-function EditorialBoardPage() {
+function EditorialBoardPage({ data }) {
   const editors = [
     {
       init: "DP",
@@ -96,7 +101,7 @@ function EditorialBoardPage() {
   return (
     <div className="max-w-7xl mx-auto  py-10 space-y-10">
       {/* ================= EDITOR IN CHIEF ================= */}
-      <section>
+      {/* <section>
         <h2 className="text-[18px] md:text-[28px] font-semibold text-[#133C49] mb-4 border-l-4 border-[#01D4FF] pl-3">
           Editor-in-Chief
         </h2>
@@ -120,7 +125,6 @@ function EditorialBoardPage() {
             of experience in engineering sciences...
           </p>
 
-          {/* TAGS */}
           <div className="flex gap-2 mt-3 flex-wrap">
             {[
               "Mechanical Engineering",
@@ -141,7 +145,7 @@ function EditorialBoardPage() {
             editor@publications.org
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* ================= ASSOCIATE EDITORS ================= */}
       <section>
@@ -150,7 +154,7 @@ function EditorialBoardPage() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {[
+          {/* {[
             {
               init: "DS",
               name: "Dr. Sarah Chen",
@@ -188,12 +192,12 @@ function EditorialBoardPage() {
               key={i}
               className="bg-[#D5F4FF] border border-[#C6E4EF] rounded-[20px] p-5 flex gap-5 items-start hover:shadow-md transition"
             >
-              {/* AVATAR */}
+             
               <div className="w-[80px] h-[80px] bg-gradient-to-b from-[#1499C5] to-[#125369] text-[26px] text-white rounded-full flex items-center justify-center font-semibold shrink-0">
                 {item.init}
               </div>
 
-              {/* INFO */}
+             
               <div>
                 <h3 className="text-[18px] font-semibold text-[#133C49]">
                   {item.name}
@@ -211,7 +215,7 @@ function EditorialBoardPage() {
                   {item.uni}
                 </p>
 
-                {/* TAGS */}
+               
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {item.tags.map((tag, idx) => (
                     <span
@@ -224,12 +228,59 @@ function EditorialBoardPage() {
                 </div>
               </div>
             </div>
+          ))} */}
+          {data?.map((item, i) => (
+            <div
+              key={i}
+              className="bg-[#D5F4FF] border border-[#C6E4EF] rounded-[20px] p-5 flex gap-5 items-start hover:shadow-md transition"
+            >
+              <div className="w-[80px] h-[80px] bg-gradient-to-b from-[#1499C5] to-[#125369] text-[26px] text-white rounded-full flex items-center justify-center font-semibold shrink-0">
+                {item.photo ? (
+                  <img
+                    src={item?.photo}
+                    alt={item?.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div>{item?.name.slice(0, 1)}</div>
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-[18px] font-semibold text-[#133C49]">
+                  {item?.name}
+                </h3>
+
+                <p className="text-[18px] text-[#00849F] font-medium mt-[2px]">
+                  {item?.designation}
+                </p>
+
+                {/* <p className="text-[14px] text-[#133C49] mt-[4px]">
+                  {item.dept}
+                </p> */}
+
+                <p className="text-[14px] text-[#133C49] mt-[4px]">
+                  {item?.affiliation}
+                </p>
+
+                {/* <div className="flex gap-2 mt-2 flex-wrap">
+                  {item.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[11px] text-[#00849F] bg-[#E7F9FF] px-3 py-[4px] rounded-[6px]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div> */}
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
       {/* ================= SECTION EDITORS ================= */}
-      <section>
+      {/* <section>
         <h2 className="text-[18px] md:text-[28px] font-semibold text-[#133C49] mb-4 border-l-4 border-[#01D4FF] pl-3">
           Section Editors
         </h2>
@@ -240,12 +291,12 @@ function EditorialBoardPage() {
               key={i}
               className="bg-[#D5F4FF] border border-[#C6E4EF] rounded-[20px] p-5 flex gap-4 items-center hover:shadow-md transition"
             >
-              {/* AVATAR */}
+              
               <div className="w-[60px] h-[60px] bg-gradient-to-b from-[#1499C5] to-[#125369] text-[22px] text-white rounded-full flex items-center justify-center font-semibold shrink-0">
                 {item.init}
               </div>
 
-              {/* INFO */}
+              
               <div>
                 <h3 className="text-[14px] font-semibold text-[#133C49]">
                   {item.name}
@@ -255,7 +306,7 @@ function EditorialBoardPage() {
                   {item.uni}
                 </p>
 
-                {/* SPECIALIZATION */}
+                
                 <p className="text-[13px] text-[#00AEEF] mt-2 font-medium">
                   {item.field}
                 </p>
@@ -263,10 +314,10 @@ function EditorialBoardPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* ================= REVIEW BOARD ================= */}
-      <section>
+      {/* <section>
         <h2 className="text-[18px] md:text-[28px] font-semibold text-[#133C49] mb-4 border-l-4 border-[#01D4FF] pl-3">
           Review Board
         </h2>
@@ -287,10 +338,10 @@ function EditorialBoardPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* ================= CTA ================= */}
-      <section className="bg-[#13404F] border border-[#235262] text-white text-center rounded-[24px] p-[24px]">
+      {/* <section className="bg-[#13404F] border border-[#235262] text-white text-center rounded-[24px] p-[24px]">
         <h2 className="text-[18px] md:text-[28px] font-semibold mb-3">
           Join Our Editorial Team
         </h2>
@@ -304,7 +355,7 @@ function EditorialBoardPage() {
           <img src="/sms2.png" alt="" className="w-[20px] h-[20px] mr-2" />
           Contact Editorial Office
         </button>
-      </section>
+      </section> */}
     </div>
   );
 }

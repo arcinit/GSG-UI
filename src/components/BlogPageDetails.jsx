@@ -1,28 +1,33 @@
 import { Search, Folder, Tag } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-export default function BlogPageDetails() {
-  const popularPosts = [
-    {
-      id: 1,
-      title: "Correlation with major bond returns (German, US)",
-      date: "09 Jan, 2025",
-      image: "/lady.jpg",
-    },
-    {
-      id: 2,
-      title: "Pre Booking Benifits for the Traveller on our Hotel",
-      date: "09 Jan, 2025",
-      image: "/aud.jpg",
-    },
-    {
-      id: 3,
-      title: "How to Book a Room online Step by Step Guide",
-      date: "09 Jan, 2025",
-      image: "/aud2.jpg",
-    },
-  ];
+export default function BlogPageDetails({
+  blog,
+  categories,
+  popularPosts,
+  tags,
+}) {
+  // const popularPosts = [
+  //   {
+  //     id: 1,
+  //     title: "Correlation with major bond returns (German, US)",
+  //     date: "09 Jan, 2025",
+  //     image: "/lady.jpg",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Pre Booking Benifits for the Traveller on our Hotel",
+  //     date: "09 Jan, 2025",
+  //     image: "/aud.jpg",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "How to Book a Room online Step by Step Guide",
+  //     date: "09 Jan, 2025",
+  //     image: "/aud2.jpg",
+  //   },
+  // ];
 
   const navigate = useNavigate();
   return (
@@ -51,7 +56,7 @@ export default function BlogPageDetails() {
             </h3>
 
             <div className="space-y-3 text-[14px] font-normal">
-              {[
+              {/* {[
                 "Business Event",
                 "Design Conference",
                 "Marketing events",
@@ -64,6 +69,15 @@ export default function BlogPageDetails() {
                 >
                   <Folder size={14} />
                   {item}
+                </div>
+              ))} */}
+              {categories.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 border border-[#1e555a] rounded-lg px-3 py-2"
+                >
+                  <Folder size={14} />
+                  {item.name}
                 </div>
               ))}
             </div>
@@ -88,7 +102,7 @@ export default function BlogPageDetails() {
                       {post.title}
                     </p>
                     <span className="text-[13px] text-[#01D4FF]">
-                      {post.date}
+                      {new Date(post.published_at).toDateString()}
                     </span>
                   </div>
                 </div>
@@ -101,7 +115,7 @@ export default function BlogPageDetails() {
             <h3 className="font-semibold mb-3">Tags</h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {["Conference", "Business", "Marketing", "Designing"].map(
+              {/* {["Conference", "Business", "Marketing", "Designing"].map(
                 (tag, i) => (
                   <span
                     key={i}
@@ -110,7 +124,15 @@ export default function BlogPageDetails() {
                     {tag}
                   </span>
                 ),
-              )}
+              )} */}
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-xs text-center border border-[#235262] bg-[#133C49] px-3 py-2 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -119,28 +141,23 @@ export default function BlogPageDetails() {
         <div className=" p-6 rounded-xl text-[#4F5C60] text-[15px] ">
           {/* CONTENT */}
           <p className="mb-4 text-[#4F5C60] font-medium text-[20px]">
-            The landscape of cardiac imaging is undergoing a revolutionary
-            transformation. As we approach 2026, new technologies are emerging
-            that promise to change how we diagnose and treat heart conditions.
+            {blog.summary}
           </p>
 
-          <h4 className="font-semibold text-[#133C49] mt-4 mb-2">
+          {/* <h4 className="font-semibold text-[#133C49] mt-4 mb-2">
             Advanced 3D Imaging Technologies
-          </h4>
+          </h4> */}
 
-          <p className="mb-4">
-            Recent developments in three-dimensional cardiac imaging have opened
-            new possibilities for understanding heart anatomy and function...
-          </p>
+          <p className="mb-4">{blog.content}</p>
 
-          <p className="italic text-[#133C49] mb-4">
+          {/* <p className="italic text-[#133C49] mb-4">
             "The combination of AI and advanced imaging is not just an
             incremental improvement—it's a paradigm shift in how we approach
             cardiac diagnostics."
             <br />— Dr. Sarah Mitchell
-          </p>
+          </p> */}
 
-          <h4 className="font-semibold text-[#133C49] mt-4 mb-2">
+          {/* <h4 className="font-semibold text-[#133C49] mt-4 mb-2">
             Molecular Imaging Breakthroughs
           </h4>
 
@@ -153,9 +170,9 @@ export default function BlogPageDetails() {
 
           <h4 className="font-semibold text-[#133C49] mt-4 mb-2">
             Integration with Wearable Devices
-          </h4>
+          </h4> */}
 
-          <p className="mb-4">
+          {/* <p className="mb-4">
             The convergence of clinical imaging with data from wearable devices
             is creating a more comprehensive picture of cardiac health...
           </p>
@@ -180,20 +197,20 @@ export default function BlogPageDetails() {
           <p>
             As we move into 2026, the convergence of these technologies will
             continue to accelerate...
-          </p>
+          </p> */}
 
           {/* DIVIDER */}
-          <div className="border-t border-2 border-[#C6E4EF] my-6"></div>
+          {/* <div className="border-t border-2 border-[#C6E4EF] my-6"></div> */}
 
           {/* AUTHOR CARD */}
-          <div className="bg-[#D5F4FF] border border-[#C6E4EF] rounded-xl p-4 flex gap-4 items-start">
-            {/* IMAGE */}
+          {/* <div className="bg-[#D5F4FF] border border-[#C6E4EF] rounded-xl p-4 flex gap-4 items-start">
+            
             <img
               src="/lady.jpg"
               className="w-[70px] h-[70px] rounded-lg object-cover"
             />
 
-            {/* INFO */}
+            
             <div className="flex-1">
               <h4 className="text-[#133C49] font-semibold mb-1">
                 About the Author
@@ -209,7 +226,7 @@ export default function BlogPageDetails() {
                 she has pioneered several breakthrough diagnostic methods.
               </p>
 
-              {/* SOCIAL */}
+              
               <div className="flex gap-2">
                 <img
                   src="/instagram.png"
@@ -220,7 +237,7 @@ export default function BlogPageDetails() {
                 <img src="/twitter.png" alt="" className="w-[24px] h-[24px]" />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

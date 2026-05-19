@@ -1,42 +1,69 @@
 import { ArrowLeft, CalendarDays, Clock, MapPin, Award } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function SessionDetails() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const session = location.state?.session;
+
+  console.log("sessions:-", session);
+
+  // convert 06:00:00 → 6:00 AM
+  const formatTime = (time) => {
+    const [h, m] = time.split(":");
+    const date = new Date();
+    date.setHours(h, m);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // duration
+  const getDuration = (start, end) => {
+    const s = new Date(`1970-01-01T${start}`);
+    const e = new Date(`1970-01-01T${end}`);
+    return (e - s) / 60000; // minutes
+  };
   return (
     <div className="w-full min-h-screen bg-[#E7F9FF] py-10 flex justify-center pt-40">
       <div className="w-[90%]">
         {/* Back */}
-        <div className="flex items-center gap-2 text-[#133C49] text-[12px] mb-4 cursor-pointer">
+        <div
+          onClick={() => navigate(`/conference/${slug}/program`)}
+          className="flex items-center gap-2 text-[#133C49] text-[12px] mb-4 cursor-pointer"
+        >
           <ArrowLeft size={16} />
           Back to Programme
         </div>
 
         {/* Tag */}
         <span className="inline-block bg-[#025C6E] text-[#01D4FF] text-[12px] px-[16px] py-[8px] rounded-[30px] mb-4">
-          Digital Cardiology
+          Track {session?.track}
         </span>
 
         {/* Title */}
         <h1 className="text-[28px] md:text-[42px] font-semibold text-[#133C49] mb-4">
-          Keynote: The Future of AI in Cardiovascular Medicine
+          {/* Keynote: The Future of AI in Cardiovascular Medicine */}
+          {session?.title}
         </h1>
 
         {/* Meta */}
         <div className="flex flex-wrap gap-6 text-[18px] text-[#4F5C60] mb-8">
           <span className="flex items-center gap-1">
-            <img src="/calendar.png" alt="" className="w-[20px] h-[20px]" />{" "}
-            September 15, 2026
+            <img src="/calendar.png" alt="" className="w-[20px] h-[20px]" /> Day{" "}
+            {session?.day}
           </span>
           <span className="flex items-center gap-1">
-            <img src="/clock.png" alt="" className="w-[20px] h-[20px]" /> 10:00
-            AM - 11:00 AM
+            <img src="/clock.png" alt="" className="w-[20px] h-[20px]" />{" "}
+            {formatTime(session?.start_time)} - {formatTime(session?.end_time)}
           </span>
           <span className="flex items-center gap-1">
             <img src="/location.png" alt="" className="w-[20px] h-[20px]" />{" "}
             Main Lobby
           </span>
           <span className="flex items-center gap-1">
-            <img src="/award2.png" alt="" className="w-[20px] h-[20px]" /> 1.5
-            CME Credits
+            <img src="/award2.png" alt="" className="w-[20px] h-[20px]" />{" "}
+            {session?.cme_credits} CME Credits
           </span>
         </div>
 
@@ -52,18 +79,19 @@ export default function SessionDetails() {
               </h3>
 
               <p className="text-[#4F5C60] text-[20px] font-medium leading-relaxed">
-                This keynote session explores the transformative potential of
+                {/* This keynote session explores the transformative potential of
                 artificial intelligence in cardiovascular medicine. From
                 advanced imaging analysis to predictive modeling, AI is
                 reshaping how we diagnose, treat, and prevent heart disease.
                 Join Dr. James Miller as he presents groundbreaking research and
                 real-world applications that are setting new standards in
-                cardiac care.
+                cardiac care. */}
+                {session?.description}
               </p>
             </div>
 
             {/* Learning Objectives */}
-            <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
+            {/* <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
               <h3 className="text-[#133C49] text-[24px] font-semibold mb-3 flex items-center gap-2">
                 <img src="/learning.png" alt="" className="w-[32px] h-[32px]" />{" "}
                 Learning Objectives
@@ -80,7 +108,7 @@ export default function SessionDetails() {
                     key={index}
                     className="flex items-center gap-3 text-[14px] text-[#1c3b44]/80"
                   >
-                    {/* Number Circle */}
+                    
                     <div className="w-6  h-6 rounded-full bg-[#00657A] text-[#01D4FF] text-[12px] flex items-center justify-center">
                       {index + 1}
                     </div>
@@ -91,10 +119,10 @@ export default function SessionDetails() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
 
             {/* Learning Objectives */}
-            <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
+            {/* <div className="bg-[#D5F4FF] rounded-[24px] p-[24px] border border-[#C6E4EF]">
               <h3 className="text-[#133C49] text-[24px] font-semibold mb-3 flex items-center gap-2">
                 <img
                   src="/learningoutcome.png"
@@ -119,7 +147,7 @@ export default function SessionDetails() {
                     key={index}
                     className="flex items-center gap-3 text-[14px] text-[#1c3b44]/80"
                   >
-                    {/* Number Circle */}
+                   
                     <div className="w-[8px] h-[8px] rounded-full bg-[#01D4FF]"></div>
 
                     <span className="text-[#4F5C60] md:text-[20px]">
@@ -128,7 +156,7 @@ export default function SessionDetails() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </div>
 
           {/* RIGHT SIDEBAR */}
@@ -142,21 +170,24 @@ export default function SessionDetails() {
               <div className="space-y-3 text-[18px]">
                 <div className="flex justify-between">
                   <span className="text-white">Duration</span>
-                  <span>60 minutes</span>
+                  <span>
+                    {getDuration(session?.start_time, session?.end_time)}{" "}
+                    minutes
+                  </span>
                 </div>
                 <div className="flex justify-between text-[18px]">
                   <span className="text-white">CME Credits</span>
-                  <span className="text-[#01D4FF]">1.5</span>
+                  <span className="text-[#01D4FF]">{session?.cme_credits}</span>
                 </div>
                 <div className="flex justify-between text-[18px]">
                   <span className="text-white">Track</span>
-                  <span>Digital Cardiology</span>
+                  <span>{session?.track}</span>
                 </div>
               </div>
             </div>
 
             {/* Speaker */}
-            <div className="bg-[#13404F] border border-[#235262] text-[#FFFFFF] rounded-[24px] p-[24px]">
+            {/* <div className="bg-[#13404F] border border-[#235262] text-[#FFFFFF] rounded-[24px] p-[24px]">
               <h3 className="text-[18px] font-semibold mb-4">Speaker</h3>
 
               <div className="flex items-center gap-3">
@@ -173,7 +204,7 @@ export default function SessionDetails() {
                   <p className="text-[18px] text-white/70">Primary Speaker</p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

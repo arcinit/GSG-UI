@@ -1,4 +1,11 @@
-export default function Footer() {
+import { useNavigate } from "react-router-dom";
+
+export default function Footer({ data }) {
+  // if (!data || !data.footer) return null;
+
+  const { phone, email, website } = data?.footer || {};
+
+  const navigate = useNavigate();
   return (
     <footer className="bg-[#154351] text-white pt-14 pb-6 px-6 md:px-16">
       <div className="max-w-7xl mx-auto">
@@ -37,15 +44,31 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-3 text-[18px] font-medium text-[#FFFFFF]">
-              <li className="hover:text-[#01D4FF] cursor-pointer">About Us</li>
-              <li className="hover:text-[#01D4FF] cursor-pointer">Our Blogs</li>
-              <li className="hover:text-[#01D4FF] cursor-pointer">
+              <li
+                onClick={() => navigate("/main/about")}
+                className="hover:text-[#01D4FF] cursor-pointer"
+              >
+                About Us
+              </li>
+              <li
+                onClick={() => navigate("/main/blogs")}
+                className="hover:text-[#01D4FF] cursor-pointer"
+              >
+                Our Blogs
+              </li>
+              <li
+                onClick={() => navigate("/main/gallery")}
+                className="hover:text-[#01D4FF] cursor-pointer"
+              >
                 Event Listing
               </li>
               <li className="hover:text-[#01D4FF] cursor-pointer">
                 Pricing Plan
               </li>
-              <li className="hover:text-[#01D4FF] cursor-pointer">
+              <li
+                onClick={() => navigate("/main/contact")}
+                className="hover:text-[#01D4FF] cursor-pointer"
+              >
                 Contact Us
               </li>
             </ul>
@@ -60,7 +83,7 @@ export default function Footer() {
             <ul className="space-y-4 text-[18px] font-medium text-[#FFFFFF]">
               <li className="flex items-center gap-3 hover:text-[#01D4FF]">
                 <img src="/f1.png" alt="" className="w-[20px] h-[20px]" />
-                +1 123 456 7890
+                {phone || "+1 123 456 7890"}
               </li>
 
               <li className="flex items-center gap-3 hover:text-[#01D4FF]">
@@ -70,12 +93,12 @@ export default function Footer() {
 
               <li className="flex items-center gap-3 hover:text-[#01D4FF]">
                 <img src="/f4.png" alt="" className="w-[20px] h-[20px]" />
-                eventifyevent@gmail.com
+                {email || "eventifyevent@gmail.com"}
               </li>
 
               <li className="flex items-center gap-3 hover:text-[#01D4FF]">
                 <img src="/f2.png" alt="" className="w-[20px] h-[20px]" />
-                eventifyevent.com
+                {website || "http://eventifyevent.com"}
               </li>
             </ul>
           </div>

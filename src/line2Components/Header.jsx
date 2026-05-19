@@ -1,21 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-export default function Header() {
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+export default function Header({ data }) {
   const [open, setOpen] = useState(false);
 
-  const navItems = [
-    { name: "Home", path: "/conference" },
-    { name: "Scientific Committee", path: "/conference/scientific-committee" },
-    { name: "Speakers", path: "/conference/speakers" },
-    { name: "Program", path: "/conference/program" },
-    { name: "Brochure", path: "/conference/brochure" },
-    { name: "Abstract", path: "/conference/abstract" },
-    { name: "Registration", path: "/conference/registration" },
-    { name: "Venue", path: "/conference/venue" },
-    { name: "Contact us", path: "/conference/contact" },
-  ];
+  const { slug } = useParams();
+
+  // const navItems = [
+  //   { name: "Home", path: "/conference" },
+  //   { name: "Scientific Committee", path: "/conference/scientific-committee" },
+  //   { name: "Speakers", path: "/conference/speakers" },
+  //   { name: "Program", path: "/conference/program" },
+  //   { name: "Brochure", path: "/conference/brochure" },
+  //   { name: "Abstract", path: "/conference/abstract" },
+  //   { name: "Registration", path: "/conference/registration" },
+  //   { name: "Venue", path: "/conference/venue" },
+  //   { name: "Contact us", path: "/conference/contact" },
+  // ];
+  // const navItems = [
+  //   { name: "Home", path: `/conference/${slug}` },
+  //   {
+  //     name: "Scientific Committee",
+  //     path: `/conference/${slug}/scientific-committee`,
+  //   },
+  //   { name: "Speakers", path: `/conference/${slug}/speakers` },
+  //   { name: "Program", path: `/conference/${slug}/program` },
+  //   { name: "Brochure", path: `/conference/${slug}/brochure` },
+  //   { name: "Abstract", path: `/conference/${slug}/abstract` },
+  //   { name: "Registration", path: `/conference/${slug}/registration` },
+  //   { name: "Venue", path: `/conference/${slug}/venue` },
+  //   { name: "Contact us", path: `/conference/${slug}/contact` },
+  // ];
+
+  const registerItem = data?.menus?.find(
+    (item) =>
+      item.is_enabled &&
+      (item.label === "Register Now" ||
+        item.url_name === "registrations:register"),
+  );
+
+  const navItems =
+    data?.menus
+      ?.filter((item) => item.is_enabled && item.label !== "Register Now")
+      ?.sort((a, b) => a.order - b.order)
+      ?.map((item) => ({
+        name: item.label,
+        path: item.resolved_url || "#",
+      })) || [];
 
   const navigate = useNavigate();
 
@@ -29,7 +61,10 @@ export default function Header() {
         bg-[#09182E] shadow-lg "
         >
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2"
+          >
             <img
               src="/logo.png"
               alt="logo"
@@ -43,6 +78,7 @@ export default function Header() {
               <NavLink
                 key={index}
                 to={item.path}
+                end={item.path === `/conference/${slug}`} // only for Home
                 className={({ isActive }) =>
                   `px-[16px] py-[8px] rounded-[12px] transition ${
                     isActive
@@ -55,12 +91,14 @@ export default function Header() {
               </NavLink>
             ))}
 
-            <button
-              onClick={() => navigate("/conference/registration-form")}
-              className="hidden md:block bg-cyan-400 text-black px-5 py-2 rounded-full font-semibold hover:bg-cyan-300 transition"
-            >
-              Register Now
-            </button>
+            {registerItem && (
+              <button
+                onClick={() => navigate(registerItem.resolved_url)}
+                className="hidden md:block bg-cyan-400 text-black px-5 py-2 rounded-full font-semibold hover:bg-cyan-300 transition"
+              >
+                Register Now
+              </button>
+            )}
           </nav>
 
           {/* Mobile Toggle */}
@@ -81,12 +119,17 @@ export default function Header() {
               </NavLink>
             ))}
 
-            <button
-              onClick={() => navigate("/conference/registration-form")}
-              className="w-full bg-cyan-400 text-black py-2 rounded-full font-semibold"
-            >
-              Register Now
-            </button>
+            {registerItem && (
+              <button
+                onClick={() => {
+                  navigate(registerItem.resolved_url);
+                  setOpen(false);
+                }}
+                className="w-full bg-cyan-400 text-black py-2 rounded-full font-semibold"
+              >
+                Register Now
+              </button>
+            )}
           </div>
         )}
       </div>

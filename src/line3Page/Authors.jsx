@@ -50,6 +50,8 @@ function AuthorGuidelinesPage() {
       desc: "Monitor your submission status through the portal.",
     },
   ];
+
+  const navigate = useNavigate();
   return (
     <div className="  p-[16px] rounded-[12px]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
@@ -332,7 +334,10 @@ function AuthorGuidelinesPage() {
               </div>
 
               <div className="mt-6">
-                <button className="flex items-center gap-2 bg-[#01D4FF] text-[#133C49] px-[16px] py-[8px] rounded-[12px] text-[14px] font-medium">
+                <button
+                  onClick={() => navigate("/journals/submit-manuscript")}
+                  className="flex items-center gap-2 bg-[#01D4FF] text-[#133C49] px-[16px] py-[8px] rounded-[12px] text-[14px] font-medium"
+                >
                   <img
                     src="/document-text.png"
                     alt=""

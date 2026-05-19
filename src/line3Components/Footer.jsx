@@ -2,7 +2,9 @@ export default function Footer() {
   return (
     <footer className="bg-[#154351] text-white pt-16 pb-6 px-6 md:px-16">
       <div className="max-w-7xl mx-auto">
+        {/* TOP GRID */}
         <div className="grid md:grid-cols-5 gap-10">
+          {/* LEFT */}
           <div>
             <img
               src="/logo.png"

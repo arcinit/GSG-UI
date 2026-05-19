@@ -3,13 +3,13 @@ import EventSchedule from "../components/EventSchedule";
 import TeamSection from "../components/TeamSection";
 import TestimonialsAbout from "../components/TestimonialsAbout";
 
-const About = () => {
+const About = ({ data, about, events }) => {
   return (
     <div>
-      <AboutHero />
-      <AboutContent />
+      <AboutHero about={about} />
+      <AboutContent about={about} />
       <StatsSection />
-      <EventSchedule />
+      <EventSchedule data={data} events={events} />
       <TeamSection />
       <TestimonialsAbout />
     </div>
@@ -18,12 +18,14 @@ const About = () => {
 
 export default About;
 
-function AboutHero() {
+function AboutHero({ about }) {
+  console.log(about);
   return (
     <section className="relative h-[60vh] flex items-center justify-center text-white overflow-hidden">
       {/* Background Image */}
       <img
-        src="/about.png"
+        // src="/about.png"
+        src={about?.hero_image || "/about.png"}
         alt="about-bg"
         className="absolute inset-0 w-full h-full object-fill object-center"
       />
@@ -31,34 +33,38 @@ function AboutHero() {
       {/* Content */}
       <div className="relative z-10 text-center">
         <h1 className="text-3xl md:text-[54px] font-medium">
-          About <span className="text-[#01D4FF]">Us</span>
+          {about?.hero_title}
+          {/* <span className="text-[#01D4FF]">Us</span> */}
         </h1>
       </div>
     </section>
   );
 }
 
-function AboutContent() {
+function AboutContent({ about }) {
   return (
     <section className="bg-[#E7F9FF] py-16 px-6 md:px-16 text-center">
       <div className="max-w-7xl mx-auto">
         {/* Small Label */}
         <p className="text-[18px] font-medium text-[#133C49] mb-3">
-          About{" "}
+          {/* About{" "}
           <span className="text-[#00849F] font-medium">
             Global Scientific Group
-          </span>
+          </span> */}
+          {about?.hero_subtitle}
         </p>
 
         {/* Heading */}
         <h2 className="text-2xl md:text-[42px] font-semibold text-[#133C49] leading-snug mb-6">
-          Growth Through World Class And{" "}
-          <span className="text-[#00849F]">Conferences</span>
+          {/* Growth Through World Class And{" "}
+          <span className="text-[#00849F]">Conferences</span> */}
+          {about?.main_heading}
         </h2>
 
         {/* Paragraph */}
         <p className="text-[#4F5C60] text-sm md:text-[18px] font-normal leading-relaxed">
-          Global Scientific Group (GSG) is a scientific event organizer and
+          {about?.description}
+          {/* Global Scientific Group (GSG) is a scientific event organizer and
           publisher founded in 2014 in San Jose, CA. In 2016, it relocated to
           Plano, TX. GSG is known for organizing national and international
           scientific conferences with participant numbers ranging from 50 to
@@ -75,7 +81,7 @@ function AboutContent() {
           GSG is governed by a board of directors comprising renowned
           scientists. Their dedication lies in supporting the scientific
           community by providing exceptional services in organizing scientific
-          conferences and open access scientific publications.
+          conferences and open access scientific publications. */}
         </p>
       </div>
     </section>

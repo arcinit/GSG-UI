@@ -1,6 +1,7 @@
 import { Search, Folder, Tag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import http from "../service/http";
 
 const blogs = [
   {
@@ -43,37 +44,78 @@ const blogs = [
 ];
 
 export default function BlogPage() {
-  const popularPosts = [
-    {
-      id: 1,
-      title: "Correlation with major bond returns (German, US)",
-      date: "09 Jan, 2025",
-      image: "/lady.jpg",
-    },
-    {
-      id: 2,
-      title: "Pre Booking Benifits for the Traveller on our Hotel",
-      date: "09 Jan, 2025",
-      image: "/aud.jpg",
-    },
-    {
-      id: 3,
-      title: "How to Book a Room online Step by Step Guide",
-      date: "09 Jan, 2025",
-      image: "/aud2.jpg",
-    },
-  ];
+  const [blogs, setBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [popularPosts, setPopularPosts] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await http.get("/blogs");
+        console.log("response:-", response);
+
+        const data = response.data;
+
+        setBlogs(data.blogs || []);
+        setCategories(data.categories || []);
+        setPopularPosts(data.popular_posts || []);
+        setTags(data.tags || []);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  // const popularPosts = [
+  //   {
+  //     id: 1,
+  //     title: "Correlation with major bond returns (German, US)",
+  //     date: "09 Jan, 2025",
+  //     image: "/lady.jpg",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Pre Booking Benifits for the Traveller on our Hotel",
+  //     date: "09 Jan, 2025",
+  //     image: "/aud.jpg",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "How to Book a Room online Step by Step Guide",
+  //     date: "09 Jan, 2025",
+  //     image: "/aud2.jpg",
+  //   },
+  // ];
 
   const ITEMS_PER_PAGE = 4;
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const filteredBlogs = selectedCategory
+    ? blogs.filter((b) => b.category === selectedCategory)
+    : blogs;
 
-  const totalPages = Math.ceil(blogs.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE);
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentBlogs = blogs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
+  const currentBlogs = filteredBlogs.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
   const navigate = useNavigate();
+  if (loading) {
+    return <div className="text-center py-20">Loading blogs...</div>;
+  }
   return (
     <section className=" py-10 px-4 md:px-10">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-[320px_1fr] gap-8">
@@ -100,7 +142,7 @@ export default function BlogPage() {
             </h3>
 
             <div className="space-y-3 text-[14px] font-normal">
-              {[
+              {/* {[
                 "Business Event",
                 "Design Conference",
                 "Marketing events",
@@ -114,6 +156,25 @@ export default function BlogPage() {
                   <Folder size={14} />
                   {item}
                 </div>
+              ))} */}
+              {categories.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    setSelectedCategory(
+                      item.id === selectedCategory ? null : item.id,
+                    )
+                  }
+                  className={`flex items-center gap-2 border rounded-lg px-3 py-2 cursor-pointer transition
+                  ${
+                    selectedCategory === item.id
+                      ? "bg-[#01D4FF] text-black"
+                      : "border-[#1e555a]"
+                  }`}
+                >
+                  <Folder size={14} />
+                  {item.name}
+                </div>
               ))}
             </div>
           </div>
@@ -125,7 +186,7 @@ export default function BlogPage() {
             </h3>
 
             <div className="space-y-4">
-              {popularPosts.map((post) => (
+              {/* {popularPosts.map((post) => (
                 <div key={post.id} className="flex gap-3">
                   <img
                     src={post.image}
@@ -141,6 +202,23 @@ export default function BlogPage() {
                     </span>
                   </div>
                 </div>
+              ))} */}
+              {popularPosts.map((post) => (
+                <div key={post.id} className="flex gap-3">
+                  <img
+                    src={post.image}
+                    className="w-[65px] h-[65px] rounded-[6px] object-cover"
+                  />
+
+                  <div>
+                    <p className="text-[13px] text-white leading-snug">
+                      {post.title}
+                    </p>
+                    <span className="text-[13px] text-[#01D4FF]">
+                      {new Date(post.published_at).toDateString()}
+                    </span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -150,7 +228,7 @@ export default function BlogPage() {
             <h3 className="font-semibold mb-3">Tags</h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {["Conference", "Business", "Marketing", "Designing"].map(
+              {/* {["Conference", "Business", "Marketing", "Designing"].map(
                 (tag, i) => (
                   <span
                     key={i}
@@ -159,7 +237,15 @@ export default function BlogPage() {
                     {tag}
                   </span>
                 ),
-              )}
+              )} */}
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-xs text-center border border-[#235262] bg-[#133C49] px-3 py-2 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -170,12 +256,24 @@ export default function BlogPage() {
             {currentBlogs.map((blog) => (
               <div
                 key={blog.id}
-                onClick={() => navigate(`/blogs-details?id=${blog.id}`)}
-                className="bg-[#D5F4FF] rounded-[24px] p-[16px]"
+                onClick={() =>
+                  navigate(`/main/blogs-details?slug=${blog.slug}`)
+                }
+                className="bg-[#D5F4FF] rounded-[24px] p-[16px] cursor-pointer
+                border border-transparent
+                hover:border-[#2AA4BF]
+                hover:shadow-[0_0_0_2px_rgba(42,164,191,0.2)]
+                hover:-translate-y-2
+                transition-all duration-300"
               >
                 {/* Image */}
+                {/* <img
+                  src={blog.image}
+                  className="w-full h-[199px] object-cover rounded-[12px] mb-3"
+                /> */}
                 <img
                   src={blog.image}
+                  // onError={(e) => (e.target.src = "/fallback.jpg")}
                   className="w-full h-[199px] object-cover rounded-[12px] mb-3"
                 />
 
@@ -188,14 +286,19 @@ export default function BlogPage() {
                       className="w-[20px] h-[20px] rounded-[4px] object-cover"
                       alt="John Carter"
                     />
-                    <span className="font-medium text-[14px]">John Carter</span>
+                    <span className="font-medium text-[14px]">
+                      {blog.author_name}
+                    </span>
                   </div>
 
                   {/* DOT */}
                   <span className="text-gray-400">•</span>
 
                   {/* DATE */}
-                  <span className="font-medium text-[14px]">29 Dec, 2025</span>
+                  <span className="font-medium text-[14px]">
+                    {" "}
+                    {new Date(blog.published_at).toDateString()}
+                  </span>
                 </div>
 
                 {/* Title */}
@@ -205,11 +308,7 @@ export default function BlogPage() {
 
                 {/* Desc */}
                 <p className="text-[#4F5C60] text-[14px] font-normal leading-relaxed">
-                  The 2nd Global Cell & Gene Therapy (CGT) Summit was held from
-                  July 7–9, 2025, in Orlando, Florida, and brought together an
-                  exceptional lineup of scientists, clinicians, industry
-                  leaders, regulatory authorities, and innovators from around
-                  the world...
+                  {blog.summary}
                 </p>
               </div>
             ))}

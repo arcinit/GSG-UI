@@ -26,7 +26,10 @@ export default function Header() {
         bg-[#09182E] shadow-lg "
         >
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2"
+          >
             <img
               src="/logo.png"
               alt="logo"
@@ -40,6 +43,7 @@ export default function Header() {
               <NavLink
                 key={index}
                 to={item.path}
+                end={item.path === "/journals"} // only for Home
                 className={({ isActive }) =>
                   `px-[16px] py-[8px] rounded-[12px] transition ${
                     isActive
