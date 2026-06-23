@@ -116,12 +116,25 @@ const Home = ({ data, events }) => {
   //   },
   // ];
   const navigate = useNavigate();
+  const [conferences, setConferences] = useState([]);
+
+  useEffect(() => {
+    const fetchConferences = async () => {
+      try {
+        const res = await http.get("/conferences/");
+        console.log('FETCHED CONFERENCES:', res.data); setConferences(res.data?.results || res.data || []);
+      } catch (err) {
+        console.error("Error fetching conferences:", err);
+      }
+    };
+    fetchConferences();
+  }, []);
 
   const images = ["/c3.png", "/c1.png", "/c2.png", "/c4.png"];
   return (
     <div>
       {/* <HeroSection /> */}
-      <HeroSectionWrapper data={data} />
+      <HeroSectionWrapper data={{ ...data, conferences }} />
       <section className="bg-[#0f3b3f] text-white py-16 px-6 md:px-16">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           {/* LEFT IMAGE GRID */}
@@ -285,9 +298,9 @@ const Home = ({ data, events }) => {
 
           {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            {events?.map((event) => (
+            {conferences?.map((conf) => (
               <div
-                key={event.id}
+                key={conf.id}
                 className="group relative bg-[#154351] rounded-2xl p-4 flex flex-col sm:flex-row gap-4 
                 transition-all duration-500 ease-out 
                 hover:scale-[1.02] 
@@ -296,7 +309,7 @@ const Home = ({ data, events }) => {
               >
                 {/* Image */}
                 <img
-                  src={"/b1.png"}
+                  src={conf.banner_image || "/b1.png"}
                   alt=""
                   className="w-full sm:w-[160px] md:w-[190px] h-[190px] object-cover rounded-xl"
                 />
@@ -310,7 +323,7 @@ const Home = ({ data, events }) => {
                       <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20">
                         <Clock size={12} strokeWidth={2.5} />
                       </span>
-                      {event.event_date}
+                      {new Date(conf.start_date).toDateString()} - {new Date(conf.end_date).toDateString()}
                     </div>
 
                     {/* Divider */}
@@ -321,38 +334,17 @@ const Home = ({ data, events }) => {
                       <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20">
                         <MapPin size={12} strokeWidth={2.5} />
                       </span>
-                      {/* {event.location} */}
-                      26/C Asana, New York
+                      {conf.city}, {conf.country}
                     </div>
                   </div>
 
                   {/* Title */}
                   <h3 className="text-[#01D4FF] text-[16px] sm:text-[17px] font-semibold mb-3">
-                    {event.title}
+                    {conf.name}
                   </h3>
 
-                  {/* Speakers */}
+                  {/* Speakers (Placeholder) */}
                   <div className="flex flex-col sm:flex-row gap-3 mb-4 bg-[#133C49] rounded-xl p-2">
-                    {/* {event.speakers.map((sp, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 px-2 py-2"
-                      >
-                        <img
-                          src={sp.img}
-                          className="w-10 h-10 sm:w-[45px] sm:h-[45px] rounded-lg object-cover"
-                        />
-                        <div className="space-y-2">
-                          <p className="text-[12px] sm:text-[13px] font-semibold">
-                            {sp.name}
-                          </p>
-                          <p className="text-[10px] text-[#a9c3c7]">
-                            {sp.role}
-                          </p>
-                        </div>
-                      </div>
-                    ))} */}
-
                     <div className="flex items-center gap-3 px-2 py-2">
                       <img
                         src={"/p2.jpg"}
@@ -372,7 +364,7 @@ const Home = ({ data, events }) => {
                   {/* Button */}
                   <button
                     onClick={() =>
-                      navigate(`/conference/${data?.conferences?.[0]?.slug}`)
+                      navigate(`/conference/${conf.slug}`)
                     }
                     className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] text-[12px] sm:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#00c2ea] transition"
                   >
