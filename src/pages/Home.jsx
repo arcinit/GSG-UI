@@ -372,7 +372,7 @@ const Home = ({ data, events }) => {
                   {/* Button */}
                   <button
                     onClick={() =>
-                      navigate(`/conference/${data?.conferences[0]?.slug}`)
+                      navigate(`/conference/${data?.conferences?.[0]?.slug}`)
                     }
                     className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] text-[12px] sm:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#00c2ea] transition"
                   >
@@ -417,7 +417,7 @@ function HeroSectionWrapper({ data }) {
 }
 
 function HeroSection({ data }) {
-  console.log("data of confrerence:-", data?.conferences[0]?.slug);
+  console.log("data of confrerence:-", data?.conferences?.[0]?.slug);
   const targetDate = new Date("2026-03-30T18:00:00").getTime();
 
   const [timeLeft, setTimeLeft] = useState(getTime());
@@ -559,7 +559,7 @@ function HeroSection({ data }) {
                 </button> */}
                 <button
                   onClick={() =>
-                    navigate(`/conference/${data?.conferences[0]?.slug}`)
+                    navigate(`/conference/${data?.conferences?.[0]?.slug}`)
                   }
                   className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] px-6 py-3 rounded-full text-[14px] font-semibold shadow-md hover:bg-[#22c7ee] transition"
                 >

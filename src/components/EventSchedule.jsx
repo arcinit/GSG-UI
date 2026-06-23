@@ -184,7 +184,7 @@ const EventSchedule = ({ data, events }) => {
                 {/* Button */}
                 <button
                   onClick={() =>
-                    navigate(`/conference/${data?.conferences[0]?.slug}`)
+                    navigate(`/conference/${data?.conferences?.[0]?.slug}`)
                   }
                   className="flex items-center gap-3 bg-[#01D4FF] text-[#00343a] text-[12px] sm:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#00c2ea] transition"
                 >
