@@ -256,6 +256,15 @@ function RegistrationForm() {
 
   const handleSubmit = async () => {
     try {
+      const countryMap = {
+        "India": "IN",
+        "United States": "US",
+        "United Kingdom": "GB",
+        "Canada": "CA",
+        "Australia": "AU"
+      };
+      const countryCode = countryMap[form.country] || form.country;
+
       const payload = {
         title: form.title,
         full_name: form.name,
@@ -264,9 +273,9 @@ function RegistrationForm() {
         email: form.email,
         alternate_email: form.altEmail,
         institution: form.institution,
-        country: form.country,
+        country: countryCode,
 
-        registration_type: form.registration_type,
+        registration_type: selectedCategory?.id,
 
         // ✅ PARTICIPATION
         participation_type_id: selectedCategory?.id,
@@ -291,7 +300,7 @@ function RegistrationForm() {
 
       console.log("Sending:", payload);
 
-      const res = await http.post(`/registrations/${slug}/register`, payload);
+      const res = await http.post(`/registrations/${slug}/register/`, payload);
 
       // console.log("Response:", res.data);
 
