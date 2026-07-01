@@ -38,9 +38,13 @@ const SecondLine = () => {
     const fetchCommon = async () => {
       try {
         const resConf = await http.get(`/conferences/${slug}/`);
+        setConferenceData(resConf?.data);
         const resVen = await http.get(`/conferences/${slug}/venue/`);
+        setVenueData(resVen.data);
         const resBrochure = await http.get(`/conferences/${slug}/brochure/`);
+        setBrochure(resBrochure.data);
         const resContact = await http.get(`/conferences/${slug}/contact/`);
+        setContact(resContact.data);
         const resProgram = await http.get(`/programs/${slug}`);
         const resSpeakers = await http.get(`/speakers/${slug}`);
         const resCommittee = await http.get(`/speakers/${slug}/committee/`);
@@ -48,13 +52,13 @@ const SecondLine = () => {
 
         console.log(resSpeakers?.data);
 
-        setConferenceData(resConf?.data);
+      
 
-        setVenueData(resVen.data);
+      
 
-        setBrochure(resBrochure.data);
+       
 
-        setContact(resContact.data);
+       
 
         setProgram(resProgram.data);
 

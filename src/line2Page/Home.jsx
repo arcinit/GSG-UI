@@ -12,6 +12,7 @@ import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
 import { useNavigate, useParams } from "react-router-dom";
 const Home = ({ data }) => {
+  console.log(data)
   return (
     <div className="bg-[#133C49]">
       <ConferenceHero data={data} />
@@ -29,137 +30,73 @@ const Home = ({ data }) => {
 export default Home;
 
 function ConferenceHero({ data }) {
+  console.log("Confrence-----------------", data)
   const [menuOpen, setMenuOpen] = useState(false);
-  // ✅ Prevent crash if (!data) return null;
   if (!data) return null;
   const { hero, conference } = data;
 
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
-    const fetchCommon = async () => {
-      try {
-        // Banner API
-        const resBanner = await http.get(`/conferences/${slug}/banners/`);
-
-        console.log("banners>>>", resBanner?.data);
-
-        // store banners
-        setBanners(resBanner.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (slug) {
-      fetchCommon();
+    // ✅ Primary source: banners already present in conference object
+    if (conference?.banners?.length) {
+      const enabledBanners = conference.banners
+        .filter((b) => b.is_enabled)
+        .sort((a, b) => a.order - b.order);
+      setBanners(enabledBanners);
+      return;
     }
-  }, [slug]);
 
-  const navigate = useNavigate();
-
-  console.log("conference data:-", data);
+    // conference.banners is empty ([]) — nothing more to fetch, we'll
+    // fall back to conference.banner_image in the render below.
+    // (Removed the extra /conferences/${slug} re-fetch here — it was
+    // parsing the wrong shape of response and never actually found
+    // any banners, so it was just a wasted network call.)
+    setBanners([]);
+  }, [slug, conference]);
 
   return (
-    // <div className="relative w-full h-screen">
-
-    //   <img
-    //     src={conference?.banner_image || "/conference.png"}
-    //     alt="conference"
-    //     className="absolute inset-0 w-full h-full object-cover"
-    //   />
-
-    //   {/* Hero Content */}
-    //   <div className="relative z-10 flex flex-col justify-center h-full px-8 md:px-20 max-w-5xl">
-    //     {/* Tag */}
-    //     <span className="bg-[#184655] text-[#01D4FF] px-[12px] py-[6px] rounded-[12px] w-fit text-[18px] mb-4">
-    //       {hero?.badge}
-    //     </span>
-
-    //     {/* Title */}
-    //     <h1 className="text-white text-4xl md:text-[54px] font-medium leading-tight">
-    //       {hero?.title}
-    //     </h1>
-
-    //     {/* Highlight */}
-    //     <div className="mt-3 mb-4">
-    //       <span className="border bg-[#FFFFFF26] border-[#01D4FF] text-[#01D4FF] px-6 py-2 rounded-lg text-3xl md:text-[54px] font-semibold inline-block">
-    //         {hero?.subtitle}
-    //       </span>
-    //     </div>
-
-    //     {/* Subtitle */}
-    //     <p className="text-[#FFFFFF] text-[18px] font-medium mb-2">
-    //       {hero?.tagline}
-    //     </p>
-
-    //     {/* Description */}
-    //     <p className="text-[#FFFFFF] text-sm md:text-[18px] font-normal mb-6 max-w-4xl">
-    //       {data?.about?.description}
-    //     </p>
-
-    //     {/* Buttons */}
-    //     <div className="flex gap-4">
-    //       {hero?.show_register && (
-    //         <button className="bg-[#01D4FF] text-[#072A41] text-[14px] px-[16px] py-[8px] rounded-[12px] font-semibold">
-    //           Register Now
-    //         </button>
-    //       )}
-    //       {hero?.show_abstract && (
-    //         <button className="border border-[#01D4FF] text-[14px] text-[#01D4FF] px-[16px] py-[8px] rounded-[12px] font-semibold">
-    //           Submit Abstract
-    //         </button>
-    //       )}
-    //     </div>
-    //   </div>
-    // </div>
     <div className="relative w-full h-screen overflow-hidden">
       {/* SWIPER */}
-      {/* <Swiper
-        modules={[Autoplay]}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
-        loop={true}
-        className="w-full h-full"
-      >
-        {(conference?.banner_images?.length
-          ? conference.banner_images
-          : [conference?.banner_image]
-        ).map((img, index) => (
-          <SwiperSlide key={index} className="relative w-full h-full">
-            
-            <img
-              src={img || "/conference.png"}
-              alt="conference"
-              className="w-full h-full object-cover"
-            />
-
-            
-            <div className="absolute inset-0 bg-[#0b3c44]/30"></div>
-          </SwiperSlide>
-        ))}
-      </Swiper> */}
-      <Swiper
-        modules={[Autoplay]}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
-        loop={true}
-        className="w-full h-full"
-      >
-        {banners?.map((banner) => (
-          <SwiperSlide key={banner.id} className="relative w-full h-full">
-            {/* IMAGE */}
-            <img
-              src={banner.image || "/conference.png"}
-              alt="conference-banner"
-              className="w-full h-full object-cover"
-            />
-
-            {/* OVERLAY */}
-            <div className="absolute inset-0 bg-[#0b3c44]/30"></div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {banners?.length > 0 ? (
+        <Swiper
+          modules={[Autoplay]}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop={banners.length > 1}
+          className="w-full h-full"
+        >
+          {banners.map((banner) => (
+            <SwiperSlide key={banner.id} className="relative w-full h-full">
+              <img
+                src={banner.image || conference?.banner_image || "/conference.png"}
+                alt="conference-banner"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-[#0b3c44]/30"></div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      ) : (
+        // fallback single image if no banners at all
+        <div className="relative w-full h-full">
+          <img
+            src={conference?.banner_image || "/conference.png"}
+            alt="conference"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // If banner_image URL is broken/404, fall back to a
+              // safe local default instead of showing nothing.
+              if (e.currentTarget.src.indexOf("/conference.png") === -1) {
+                e.currentTarget.src = "/conference.png";
+              }
+            }}
+          />
+          <div className="absolute inset-0 bg-[#0b3c44]/30"></div>
+        </div>
+      )}
 
       {/* HERO CONTENT */}
       <div className="absolute inset-0 z-10 flex flex-col justify-center px-8 md:px-20 max-w-5xl">
@@ -310,19 +247,11 @@ function AboutSection({ data }) {
 
         {/* Paragraph */}
         <p className="text-[#FFFFFF]/90 text-[18px] font-normal leading-relaxed">
-          {/* The <span className="text-[#01D4FF] font-medium">GCC 2026</span> is a
-          premier global event dedicated to the latest advancements in
-          cardiovascular medicine. This annual meeting brings together renowned
-          experts to share ground-breaking research, innovative technologies,
-          and best practices that shape the future of heart care. */}
           {about?.title}
         </p>
 
         {/* Second Paragraph */}
         <p className="text-[#FFFFFF]/90 text-[18px] font-normal leading-relaxed mt-4">
-          {/* Participants will engage in interactive sessions, hands-on workshops,
-          live demonstrations, and evidence-based discussions focused on
-          improving patient outcomes across all cardiovascular specialties. */}
           {about?.description}
         </p>
       </div>
@@ -330,33 +259,106 @@ function AboutSection({ data }) {
   );
 }
 
+
+const FALLBACK_AUDIENCE = [
+  "Cardiologists & Cardiac Surgeons",
+  "Internal Medicine Physicians",
+  "Interventional Cardiologists",
+  "Cardiovascular Researchers",
+  "Nurses & Allied Health Professionals",
+  "Medical Students & Residents",
+  "Medical Device & Pharma Professionals",
+  "Digital Health Innovators",
+];
+
+const FALLBACK_WHY_ATTEND = [
+  { id: "fb-1", icon: "1", title: "Connect with global experts and peers" },
+  { id: "fb-2", icon: "2", title: "Explore ground breaking research" },
+  { id: "fb-3", icon: "3", title: "Gain actionable clinical insights" },
+  { id: "fb-4", icon: "4", title: "Experience emerging cardiology technologies" },
+  { id: "fb-5", icon: "5", title: "Earn CME credits" },
+  { id: "fb-6", icon: "6", title: "Expand your professional network" },
+];
+
+const FALLBACK_SESSIONS = [
+  {
+    id: "fb-1",
+    order: 1,
+    title: "Artificial Intelligence & Digital Cardiology",
+    topics: [
+      {
+        topic:
+          "AI-driven risk prediction models for heart failure readmissions. Machine-learning algorithms for early detection of arrhythmias in wearable data. Digital twin simulations in personalized cardiovascular therapy. Automated echo interpretation vs. expert readers: accuracy and outcomes. Remote monitoring platforms and their impact on mortality in chronic cardiac patients.",
+      },
+    ],
+  },
+  {
+    id: "fb-2",
+    order: 2,
+    title: "Heart Failure & Cardiomyopathies",
+    topics: [
+      {
+        topic:
+          "Effects of SGLT2 inhibitors in HFpEF: real-world evidence. Biomarker-guided therapy (NT-proBNP, troponins, galectin-3). Cardiac amyloidosis: novel imaging modalities (strain, PET tracers). Gene therapy approaches for dilated cardiomyopathy. Telemedicine-based HF management: cost and clinical impact.",
+      },
+    ],
+  },
+  {
+    id: "fb-3",
+    order: 3,
+    title: "Interventional & Structural Cardiology",
+    topics: [
+      {
+        topic:
+          "Long-term outcomes of TAVI in low-risk younger populations. Cerebral protection devices during TAVI—do they reduce stroke? Innovations in left atrial appendage occlusion. Comparative data: drug-coated balloons vs. DES in de novo small-vessel disease. Intravascular lithotripsy for heavily calcified coronary lesions.",
+      },
+    ],
+  },
+  {
+    id: "fb-4",
+    order: 4,
+    title: "Electrophysiology & Arrhythmias",
+    topics: [
+      {
+        topic:
+          "Pulsed-field ablation: efficacy and safety profiles in persistent AF. Genetic drivers of inherited arrhythmia syndromes. Wearable-detected AF: impact on stroke prevention strategies. Conduction system pacing (His/LBB pacing) compared with conventional CRT. AI-assisted mapping for complex VT ablation.",
+      },
+    ],
+  },
+  {
+    id: "fb-5",
+    order: 5,
+    title: "Preventive Cardiology & Lipidology",
+    topics: [
+      {
+        topic:
+          "PCSK9 inhibitors and RNA therapies (inclisiran) in statin-intolerant patients. Impact of ultra-processed foods on cardiovascular risk markers. Novel therapies for lipoprotein(a) reduction. Lifestyle interventions measured via digital coaching platforms. Coronary calcium scoring and lifetime risk assessment.",
+      },
+    ],
+  },
+];
+
+const FALLBACK_GALLERY = [
+  { id: "fb-1", title: "Business World Event Introduction", event_date: "2025-11-24", preview_image: "/b12.png" },
+  { id: "fb-2", title: "Business World Event Introduction", event_date: "2025-11-24", preview_image: "/g1.jpg" },
+  { id: "fb-3", title: "Business World Event Introduction", event_date: "2025-11-24", preview_image: "/g2.jpg" },
+  { id: "fb-4", title: "Business World Event Introduction", event_date: "2025-11-24", preview_image: "/g3.jpg" },
+];
+/* ---------------------------------------------------------------- */
+
 function WhoShouldAttend({ data }) {
-  if (!data || !data.audience) return null;
+  const apiTitles = data?.audience
+    ?.filter((item) => item.is_enabled)
+    ?.map((item) => item.title) || [];
 
-  // Step 1: Filter enabled + extract titles
-  const audienceTitles = data.audience
-    .filter((item) => item.is_enabled)
-    .map((item) => item.title);
+  // Use real API data if it has entries, otherwise fall back so the
+  // section still renders like the design.
+  const audienceTitles = apiTitles.length ? apiTitles : FALLBACK_AUDIENCE;
 
-  // Step 2: Convert into 3 columns
   const columns = [[], [], []];
   audienceTitles.forEach((item, index) => {
     columns[index % 3].push(item);
   });
-
-  // const data = [
-  //   [
-  //     "Cardiologists & Cardiac Surgeons",
-  //     "Cardiovascular Researchers",
-  //     "Medical Device & Pharma Professionals",
-  //   ],
-  //   [
-  //     "Internal Medicine Physicians",
-  //     "Nurses & Allied Health Professionals",
-  //     "Digital Health Innovator",
-  //   ],
-  //   ["Interventional Cardiologists", "Medical Students & Residents"],
-  // ];
 
   return (
     <div className="w-full flex justify-center py-16 bg-[#144251] relative overflow-hidden">
@@ -371,19 +373,6 @@ function WhoShouldAttend({ data }) {
 
         {/* Grid */}
         <div className="grid md:grid-cols-3 gap-8 text-left">
-          {/* {data.map((col, i) => (
-            <ul key={i} className="space-y-4">
-              {col.map((item, index) => (
-                <li
-                  key={index}
-                  className="text-[#FFFFFF]/90 text-[20px] font-medium flex items-start gap-2"
-                >
-                  <span className="text-[#FFFFFF]/90">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          ))} */}
           {columns.map((col, i) => (
             <ul key={i} className="space-y-4">
               {col.map((item, index) => (
@@ -403,98 +392,9 @@ function WhoShouldAttend({ data }) {
   );
 }
 
-// function WhyAttend() {
-//   const features = [
-//     {
-//       icon: "/1.png",
-//       text: "Connect with global experts and peers",
-//     },
-//     {
-//       icon: "/2.png",
-//       text: "Explore ground breaking research",
-//     },
-//     {
-//       icon: "/3.png",
-//       text: "Gain actionable clinical insights",
-//     },
-//     {
-//       icon: "/4.png",
-//       text: "Experience emerging cardiology technologies",
-//     },
-//     {
-//       icon: "/5.png",
-//       text: "Earn CME credits",
-//     },
-//     {
-//       icon: "/6.png",
-//       text: "Expand your professional network",
-//     },
-//   ];
-
-//   return (
-//     <div className="w-full flex justify-center py-16 ">
-//       <div className="w-[90%] ">
-//         {/* Heading */}
-//         <h2 className="text-white text-center text-[28px] md:text-[42px] font-semibold mb-10">
-//           Why <span className="text-[#00D1FF]">Attend</span>
-//         </h2>
-
-//         {/* Content */}
-//         <div className="grid md:grid-cols-2 gap-10 items-start">
-//           {/* LEFT TEXT */}
-//           <div className="text-[#FFFFFF]/90 text-[18px] font-normal leading-relaxed space-y-4">
-//             <p>
-//               We warmly invite you to be part of this unique gathering of minds,
-//               traditions, and innovations. Whether you are a seasoned
-//               practitioner, researcher, student, or policy advocate, your voice
-//               and expertise are essential to shaping the future of complementary
-//               and integrative medicine.
-//             </p>
-
-//             <p>
-//               Join us as we advance whole-person care and build meaningful
-//               bridges between ancient wisdom and modern science.
-//             </p>
-
-//             <p>
-//               We look forward to welcoming you to the conference.
-//               <br />
-//               For further information, please contact the Conference Organizer
-//             </p>
-//           </div>
-
-//           {/* RIGHT CARDS */}
-//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//             {features.map((item, index) => (
-//               <div
-//                 key={index}
-//                 className="flex items-start gap-3 bg-[#154351] p-[12px] rounded-[12px] border border-white/5"
-//               >
-//                 <div className="w-[48px] h-[48px]">
-//                   <img
-//                     src={item.icon}
-//                     alt=""
-//                     className="w-full h-full object-fill"
-//                   />
-//                 </div>
-
-//                 <p className="text-[#FFFFFF]/90 font-medium text-[18px] leading-snug">
-//                   {item.text}
-//                 </p>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 function WhyAttend({ data }) {
-  if (!data || !data.why_attend) return null;
-
-  // Step 1: Filter enabled items
-  const features = data.why_attend.filter((item) => item.is_enabled);
+  const apiFeatures = data?.why_attend?.filter((item) => item.is_enabled) || [];
+  const features = apiFeatures.length ? apiFeatures : FALLBACK_WHY_ATTEND;
 
   return (
     <div className="w-full flex justify-center py-16">
@@ -525,7 +425,7 @@ function WhyAttend({ data }) {
 
           {/* RIGHT CARDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {features.map((item, index) => (
+            {features.map((item) => (
               <div
                 key={item.id}
                 className="flex items-start gap-3 bg-[#154351] p-[12px] rounded-[12px] border border-white/5"
@@ -552,156 +452,15 @@ function WhyAttend({ data }) {
   );
 }
 
-// function ScientificSessions() {
-//   const sessions = [
-//     {
-//       id: "01",
-//       title: "Artificial Intelligence & Digital Cardiology",
-//       points: [
-//         "AI-driven risk prediction models for heart failure readmissions",
-//         "Machine-learning algorithms for early detection of arrhythmias in wearable data",
-//         "Digital twin simulations in personalized cardiovascular therapy",
-//         "Automated echo interpretation vs. expert readers: accuracy and outcomes",
-//         "Remote monitoring platforms and their impact on mortality in chronic cardiac patient",
-//       ],
-//     },
-//     {
-//       id: "02",
-//       title: "Heart Failure & Cardiomyopathies",
-//       points: [
-//         "Effects of SGLT2 inhibitors in HFpEF: real-world evidence",
-//         "Biomarker-guided therapy (NT-proBNP, troponins, galectin-3)",
-//         "Cardiac amyloidosis: novel imaging modalities (strain, PET tracers)",
-//         "Gene therapy approaches for dilated cardiomyopathy",
-//         "Telemedicine-based HF management: cost and clinical impact",
-//       ],
-//     },
-//     {
-//       id: "03",
-//       title: "Interventional & Structural Cardiology",
-//       points: [
-//         "Long-term outcomes of TAVI in low-risk younger populations",
-//         "Cerebral protection devices during TAVI—do they reduce stroke?",
-//         "Innovations in left atrial appendage occlusion",
-//         "Comparative data: drug-coated balloons vs. DES in de novo small-vessel disease",
-//         "Intravascular lithotripsy for heavily calcified coronary lesions",
-//       ],
-//     },
-//     {
-//       id: "04",
-//       title: "Electrophysiology & Arrhythmias",
-//       points: [
-//         "Pulsed-field ablation: efficacy and safety profiles in persistent AF",
-//         "Genetic drivers of inherited arrhythmia syndromes",
-//         "Wearable-detected AF: impact on stroke prevention strategies",
-//         "Conduction system pacing (His/LBB pacing) compared with conventional CRT",
-//         "AI-assisted mapping for complex VT ablation",
-//       ],
-//     },
-//     {
-//       id: "05",
-//       title: "Preventive Cardiology & Lipidology",
-//       points: [
-//         "PCSK9 inhibitors and RNA therapies (inclisiran) in statin-intolerant patients",
-//         "Impact of ultra-processed foods on cardiovascular risk markers",
-//         "Novel therapies for lipoprotein(a) reduction",
-//         "Lifestyle interventions measured via digital coaching platforms",
-//         "Coronary calcium scoring and lifetime risk assessment",
-//       ],
-//     },
-//     {
-//       id: "06",
-//       title: "Coronary Artery Disease & Imaging",
-//       points: [
-//         "CT-based FFR vs. invasive FFR: diagnostic performance",
-//         "Plaque characterization using photon-counting CT",
-//         "Prognostic value of stress CMR with myocardial blood flow quantification",
-//         "Role of PET imaging in microvascular angina",
-//         "Multimodality imaging in MINOCA (MRI, OCT, PET)",
-//       ],
-//     },
-//     {
-//       id: "07",
-//       title: "Cardio-Oncology",
-//       points: [
-//         "Early detection of chemotherapy-induced cardiotoxicity via strain imaging",
-//         "Immune checkpoint inhibitors: patterns of myocarditis",
-//         "Biomarker-guided cardioprotection protocols",
-//         "Survivorship models for long-term CV monitoring in cancer patients",
-//       ],
-//     },
-//     {
-//       id: "08",
-//       title: "Global Cardiology & Public Health",
-//       points: [
-//         "Impact of climate change on cardiovascular morbidity (heat waves, pollution)",
-//         "Access to cardiovascular care in low-resource settings",
-//         "Mobile health interventions for hypertension control in rural areas",
-//         "Multicentric cohort comparisons of CVD risk prediction tools",
-//       ],
-//     },
-//   ];
-
-//   return (
-//     <div className="w-full flex justify-center py-16 bg-[#154351]">
-//       <div className="w-[90%] max-w-5xl">
-//         {/* Heading */}
-//         <h2 className="text-white text-center text-[28px] md:text-[42px] font-semibold mb-10">
-//           <span className="text-[#00D1FF]">Scientific</span> Sessions
-//         </h2>
-
-//         {/* Timeline */}
-//         <div className="relative">
-//           {/* Vertical Line */}
-//           {sessions.length > 1 && (
-//             <div className="absolute left-5 top-6 bottom-6 border-l-2 border-dashed border-[#2FA4B3]"></div>
-//           )}
-//           <div className="space-y-8">
-//             {sessions.map((item, index) => (
-//               <div key={index} className="flex items-start gap-6 ">
-//                 {/* Number */}
-//                 <div className="relative z-10 flex items-center justify-center w-10 h-10 rounded-full bg-[#133C49] text-[#00D1FF] font-semibold">
-//                   {item.id}
-//                 </div>
-
-//                 {/* Card */}
-//                 <div className="flex-1 bg-[#133C49] rounded-[24px] p-[24px]">
-//                   {/* Title */}
-//                   <h3 className="text-[#01D4FF] text-[24px] font-semibold mb-3">
-//                     {item.title}
-//                   </h3>
-
-//                   {/* Points */}
-//                   <ul className="space-y-2">
-//                     {item.points.map((point, i) => (
-//                       <li
-//                         key={i}
-//                         className="text-white/90 text-[20px] font-medium flex gap-2"
-//                       >
-//                         <span className="text-white/50">•</span>
-//                         <span>{point}</span>
-//                       </li>
-//                     ))}
-//                   </ul>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 function ScientificSessions({ data }) {
-  if (!data || !data.sessions) return null;
+  const apiSessions =
+    data?.sessions
+      ?.filter((s) => s.is_enabled)
+      ?.sort((a, b) => a.order - b.order) || [];
 
-  // Step 1: filter + sort
-  const sessions = data.sessions
-    .filter((s) => s.is_enabled)
-    .sort((a, b) => a.order - b.order);
+  const sessions = apiSessions.length ? apiSessions : FALLBACK_SESSIONS;
 
-  // Step 2: convert topic string → bullet points
+  // Step: convert topic string → bullet points
   const formatPoints = (text) => {
     if (!text) return [];
 
@@ -726,7 +485,7 @@ function ScientificSessions({ data }) {
           )}
 
           <div className="space-y-8">
-            {sessions.map((item, index) => {
+            {sessions.map((item) => {
               const topicText = item.topics?.[0]?.topic || "";
               const points = formatPoints(topicText);
 
@@ -767,97 +526,7 @@ function ScientificSessions({ data }) {
   );
 }
 
-const galleryData = [
-  {
-    id: 1,
-    image: "/b12.png",
-    title: "Business World Event Introduction",
-    date: "24 Nov 2025",
-  },
-  {
-    id: 2,
-    image: "/g1.jpg",
-    title: "Business World Event Introduction",
-    date: "24 Nov 2025",
-  },
-  {
-    id: 3,
-    image: "/g2.jpg",
-    title: "Business World Event Introduction",
-    date: "24 Nov 2025",
-  },
-  {
-    id: 4,
-    image: "/g3.jpg",
-    title: "Business World Event Introduction",
-    date: "24 Nov 2025",
-  },
-];
-
-// function Gallery() {
-//   return (
-//     <section className="bg-[#133C49] py-16 px-6 md:px-16 text-white">
-//       <div className="max-w-7xl mx-auto text-center">
-//         {/* Heading */}
-//         <h2 className="text-3xl md:text-4xl font-semibold mb-12">Gallery</h2>
-
-//         {/* Cards */}
-//         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-left">
-//           {galleryData.map((item) => (
-//             <div
-//               key={item.id}
-//               className="bg-[#13404F] rounded-2xl overflow-hidden hover:-translate-y-1 transition"
-//             >
-//               {/* Image */}
-//               <img
-//                 src={item.image}
-//                 alt={item.title}
-//                 className="w-full h-[180px] object-cover"
-//               />
-
-//               {/* Content */}
-//               <div className="p-4">
-//                 <h3 className="text-[14px] text-[#FFFFFF] font-medium mb-2">
-//                   {item.title}
-//                 </h3>
-
-//                 <div className="flex items-center gap-2 text-[12px] text-[#FFFFFF]/70">
-//                   <span>
-//                     <CalendarDays size={16} strokeWidth={2.5} />
-//                   </span>
-//                   <span>{item.date}</span>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-
-//         {/* Button */}
-//         <div className="mt-12 flex justify-center">
-//           <button className="flex items-center gap-4 bg-[#01D4FF] text-[#00343a] text-[14px] font-semibold px-8 py-4 rounded-full shadow-sm hover:bg-[#00c2ea] transition">
-//             View More
-//             <span className="w-7 h-7 flex items-center justify-center bg-white text-black rounded-full text-sm">
-//               →
-//             </span>
-//           </button>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-function Gallery({ data }) {
-  // if (!data || !data.gallery_events) return null;
-
-  // Step 1: map API → UI format
-  // const galleryData = data.gallery_events.map((item, index) => ({
-  //   id: item.id,
-  //   title: item.title,
-  //   date: item.event_date,
-  //   // fallback image (since API doesn't provide)
-  //   image: `/gallery/${index + 1}.jpg`,
-  // }));
-
+function Gallery() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -867,13 +536,15 @@ function Gallery({ data }) {
     const fetchGallery = async () => {
       try {
         const res = await http.get("/gallery");
-        const data = res.data;
+        const resData = res.data;
 
-        console.log(data);
+        console.log(resData);
 
-        setItems(data.results || []);
+        const results = resData?.results || [];
+        setItems(results.length ? results : FALLBACK_GALLERY);
       } catch (err) {
         console.error(err);
+        setItems(FALLBACK_GALLERY);
       } finally {
         setLoading(false);
       }
@@ -889,37 +560,11 @@ function Gallery({ data }) {
         <h2 className="text-3xl md:text-4xl font-semibold mb-12">Gallery</h2>
 
         {/* Cards */}
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-left">
-          {items?.map((item) => (
-            <div
-              key={item.id}
-              className="bg-[#13404F] rounded-2xl overflow-hidden hover:-translate-y-1 transition"
-            >
-             
-              <img
-                src={item?.preview_image || "/b12.png"}
-                alt={item.title}
-                className="w-full h-[180px] object-cover"
-              />
-
-             
-              <div className="p-4">
-                <h3 className="text-[14px] font-medium mb-2">{item.title}</h3>
-
-                <div className="flex items-center gap-2 text-[12px] text-white/70">
-                  <CalendarDays size={16} strokeWidth={2.5} />
-                  <span>{new Date(item.event_date).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div> */}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-left">
           {items?.map((item) => (
             <div
               key={item.id}
-              className="bg-[#13404F] rounded-2xl overflow-hidden 
+              className="bg-[#13404F] rounded-2xl overflow-hidden
                  group cursor-pointer"
             >
               {/* IMAGE WRAPPER */}
@@ -950,6 +595,19 @@ function Gallery({ data }) {
                       →
                     </span>
                   </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="text-[14px] font-medium mb-2">{item.title}</h3>
+                <div className="flex items-center gap-2 text-[12px] text-white/70">
+                  <CalendarDays size={16} strokeWidth={2.5} />
+                  <span>
+                    {item.event_date
+                      ? new Date(item.event_date).toLocaleDateString()
+                      : ""}
+                  </span>
                 </div>
               </div>
             </div>
