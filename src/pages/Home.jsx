@@ -578,7 +578,7 @@ function HeroSection({ data }) {
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[65%] z-[50]">
         <div className="flex items-center  gap-6 bg-[#01D4FF26] backdrop-blur-md px-6 py-6 rounded-t-2xl">
           {/* COUNT BOXES */}
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             {[
               { label: "DAYS", value: timeLeft.days },
               { label: "Hours", value: timeLeft.hours },
@@ -595,10 +595,10 @@ function HeroSection({ data }) {
                 <p className="text-[18px] mt-1 tracking-wide ">{item.label}</p>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* EVENT INFO */}
-          <div className="text-white  text-[18px] space-y-2">
+          <div className="text-white space-x-3  text-[18px] space-y-2">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg text-[13px] text-white">
               <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20">
                 <CalendarDays size={12} strokeWidth={2.5} />
