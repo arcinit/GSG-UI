@@ -335,7 +335,7 @@ function RegistrationForm() {
                 onChange={(v) => handleChange("name", v)}
               />
 
-              <Input
+              <PhoneInput
                 label="Phone"
                 star
                 value={form.phone}
@@ -374,6 +374,8 @@ function RegistrationForm() {
                 value={form.country}
                 onChange={(v) => handleChange("country", v)}
               />
+
+             
 
               {/* <Select
                 label="Registration Type"
@@ -909,18 +911,37 @@ function Select({ label, options = [], value, onChange }) {
         {label} <span className="text-[#FF3939]">*</span>
       </label>
 
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full mt-1 bg-[#E7F9FF] border border-[#C6E4EF] rounded-[12px] p-[16px] text-[14px]"
-      >
-        <option value="">Select</option>
-        {options.map((item, i) => (
-          <option key={i} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
+      <div className="relative mt-1">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none bg-[#E7F9FF] border border-[#C6E4EF] rounded-[12px] p-[16px] pr-[44px] text-[14px] text-[#133C49]"
+        >
+          <option value="">Select</option>
+          {options.map((item, i) => (
+            <option key={i} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+
+        {/* Custom chevron icon */}
+        <svg
+          className="pointer-events-none absolute right-[16px] top-1/2 -translate-y-1/2"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="#000"
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="#133C49"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
     </div>
   );
 }
@@ -1088,3 +1109,83 @@ function RegistrationSummary() {
     </div>
   );
 }
+
+
+
+
+
+const COUNTRIES = [
+  { code: "US", dial: "+1", flag: "🇺🇸" },
+  { code: "IN", dial: "+91", flag: "🇮🇳" },
+  { code: "GB", dial: "+44", flag: "🇬🇧" },
+  { code: "AE", dial: "+971", flag: "🇦🇪" },
+  { code: "CA", dial: "+1", flag: "🇨🇦" },
+  { code: "AU", dial: "+61", flag: "🇦🇺" },
+];
+
+function PhoneInput({ label = "Phone", star, value, onChange }) {
+  const [country, setCountry] = useState(COUNTRIES[0]);
+  const [open, setOpen] = useState(false);
+
+  const handleNumberChange = (e) => {
+    const raw = e.target.value.replace(/[^\d]/g, "");
+    onChange({ dial: country.dial, number: raw });
+  };
+
+  const handleCountrySelect = (c) => {
+    setCountry(c);
+    setOpen(false);
+    onChange({ dial: c.dial, number: value?.number || "" });
+  };
+
+  return (
+    <div>
+      <label className="text-[14px] text-[#133C49] font-medium">
+        {label} {star && <span className="text-[#FF3939]">*</span>}
+      </label>
+
+      <div className="relative mt-1 flex items-center bg-[#E7F9FF] border border-[#C6E4EF] rounded-[12px] px-[16px] py-[14px]">
+        {/* Country code selector */}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex items-center gap-1 text-[14px] text-[#133C49] font-medium shrink-0"
+        >
+          <span>{country.dial}</span>
+          <span className="text-[16px] leading-none">{country.flag}</span>
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-[20px] bg-[#C6E4EF] mx-3" />
+
+        {/* Phone number field */}
+        <input
+          type="tel"
+          value={value?.number || ""}
+          onChange={handleNumberChange}
+          placeholder="X XX XX XX XX"
+          className="flex-1 bg-transparent outline-none text-[14px] text-[#133C49] placeholder-[#9BB8C2]"
+        />
+
+        {/* Dropdown */}
+        {open && (
+          <div className="absolute top-full left-0 mt-1 w-[200px] bg-white border border-[#C6E4EF] rounded-[12px] shadow-md z-10 max-h-[220px] overflow-y-auto">
+            {COUNTRIES.map((c) => (
+              <button
+                key={c.code}
+                type="button"
+                onClick={() => handleCountrySelect(c)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-[14px] text-[#133C49] hover:bg-[#E7F9FF] text-left"
+              >
+                <span className="text-[16px]">{c.flag}</span>
+                <span>{c.dial}</span>
+                <span className="text-[#5B7A85] text-[13px]">{c.code}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
